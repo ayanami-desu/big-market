@@ -1,4 +1,4 @@
-package re.yuugu.hzx.infrastructure.dao.po;
+package re.yuugu.hzx.infrastructure.persistent.po;
 
 import lombok.Data;
 

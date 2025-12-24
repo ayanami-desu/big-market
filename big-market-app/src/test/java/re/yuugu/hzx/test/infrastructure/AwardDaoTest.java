@@ -6,8 +6,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import re.yuugu.hzx.infrastructure.dao.IAwardDao;
-import re.yuugu.hzx.infrastructure.dao.po.Award;
+import re.yuugu.hzx.infrastructure.persistent.dao.IAwardDao;
+import re.yuugu.hzx.infrastructure.persistent.po.Award;
 
 import javax.annotation.Resource;
 import java.util.List;

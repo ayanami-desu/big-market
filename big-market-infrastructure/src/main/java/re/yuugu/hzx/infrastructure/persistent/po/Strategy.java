@@ -1,4 +1,4 @@
-package re.yuugu.hzx.infrastructure.dao.po;
+package re.yuugu.hzx.infrastructure.persistent.po;
 
 import lombok.Data;
 
@@ -11,13 +11,17 @@ public class Strategy {
      */
     private Long id;
     /**
-     * 抽奖策略ID
+     * 抽奖策略 ID
      */
     private Long strategyId;
     /**
      * 抽奖策略描述
      */
     private String strategyDesc;
+    /**
+     * 抽奖策略规则模型
+     */
+    private String ruleModels;
     /**
      * 创建时间
      */

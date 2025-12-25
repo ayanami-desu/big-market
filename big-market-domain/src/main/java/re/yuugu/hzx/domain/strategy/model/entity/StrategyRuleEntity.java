@@ -44,6 +44,13 @@ public class StrategyRuleEntity {
      */
     private String ruleDesc;
 
+    /**
+     * 返回权重字典
+     * e.g. {
+     *       "4000:102,103,104,105,106,107,108,109":[102,103,104,105,106,107,108,109],
+     *       "6000:103,104,105,106,107,108,109":[103,104,105,106,107,108,109]
+     *      }
+     */
     public Map<String, List<Integer>> getRuleWeights() {
         if (!"rule_weight".equals(ruleModel)) return null;
         if (StringUtils.isBlank(ruleValue)) return null;

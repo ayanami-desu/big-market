@@ -110,4 +110,22 @@ public class StrategyRepository implements IStrategyRepository {
                 .ruleDesc(s.getRuleDesc())
                 .build();
     }
+
+    @Override
+    public String queryStrategyRuleValue(Long strategyId, String ruleModel, Integer awardId) {
+        String cacheKey = Constants.RedisKeys.STRATEGY_RULE_VALUE_KEY
+                + strategyId
+                + "_" + ruleModel
+                + "_" + (awardId == null ? "no_award_id" : awardId);
+        String ruleValue = redisService.getValue(cacheKey);
+        if (ruleValue!=null){return ruleValue;}
+        // query database
+        StrategyRule strategyRuleReq = new StrategyRule();
+        strategyRuleReq.setStrategyId(strategyId);
+        strategyRuleReq.setRuleModel(ruleModel);
+        strategyRuleReq.setAwardId(awardId);
+        StrategyRule s = strategyRuleDao.queryStrategyRule(strategyRuleReq);
+        redisService.setValue(cacheKey,s.getRuleValue());
+        return s.getRuleValue();
+    }
 }

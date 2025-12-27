@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import re.yuugu.hzx.domain.strategy.service.rule.factory.DefaultLogicFactory;
+import re.yuugu.hzx.domain.strategy.service.rule.filter.factory.DefaultLogicFactory;
 import re.yuugu.hzx.types.common.Constants;
 
 import java.util.Arrays;

@@ -13,8 +13,8 @@ import re.yuugu.hzx.domain.strategy.model.entity.GachaFactorEntity;
 import re.yuugu.hzx.domain.strategy.service.IGachaStrategy;
 import javax.annotation.Resource;
 
-import re.yuugu.hzx.domain.strategy.service.rule.impl.RuleLockLogicFilter;
-import re.yuugu.hzx.domain.strategy.service.rule.impl.RuleWeightLogicFilter;
+import re.yuugu.hzx.domain.strategy.service.rule.chain.impl.RuleWeightLogicChain;
+import re.yuugu.hzx.domain.strategy.service.rule.filter.impl.RuleLockLogicFilter;
 
 
 @Slf4j
@@ -25,13 +25,13 @@ public class GachaTest {
     @Resource
     private IGachaStrategy gachaStrategy;
     @Resource
-    private RuleWeightLogicFilter ruleWeightLogicFilter;
+    private RuleWeightLogicChain ruleWeightLogicChain;
     @Resource
     private RuleLockLogicFilter ruleLockLogicFilter;
 
     @Before
     public void setUserPoint(){
-        ReflectionTestUtils.setField(ruleWeightLogicFilter,"userPoint",6001L);
+        ReflectionTestUtils.setField(ruleWeightLogicChain,"userPoint",6001L);
     }
     @Before
     public void setUserGachaCount(){

@@ -1,4 +1,4 @@
-package re.yuugu.hzx.domain.strategy.service.rule;
+package re.yuugu.hzx.domain.strategy.service.rule.filter;
 
 import re.yuugu.hzx.domain.strategy.model.entity.RuleActionEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.RuleDetailEntity;

@@ -12,6 +12,8 @@ import re.yuugu.hzx.domain.strategy.model.entity.GachaAwardEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.GachaFactorEntity;
 import re.yuugu.hzx.domain.strategy.service.IGachaStrategy;
 import javax.annotation.Resource;
+
+import re.yuugu.hzx.domain.strategy.service.rule.impl.RuleLockLogicFilter;
 import re.yuugu.hzx.domain.strategy.service.rule.impl.RuleWeightLogicFilter;
 
 
@@ -24,17 +26,23 @@ public class GachaTest {
     private IGachaStrategy gachaStrategy;
     @Resource
     private RuleWeightLogicFilter ruleWeightLogicFilter;
+    @Resource
+    private RuleLockLogicFilter ruleLockLogicFilter;
 
     @Before
     public void setUserPoint(){
         ReflectionTestUtils.setField(ruleWeightLogicFilter,"userPoint",6001L);
+    }
+    @Before
+    public void setUserGachaCount(){
+        ReflectionTestUtils.setField(ruleLockLogicFilter,"userGachaCount",3L);
     }
 
     @Test
     public void test_performGacha() {
         GachaFactorEntity gachaFactorEntity = new GachaFactorEntity();
         gachaFactorEntity.setStrategyId(100001L);
-        gachaFactorEntity.setUserId("hzxxxx");
+        gachaFactorEntity.setUserId("hzx");
         GachaAwardEntity gachaAwardEntity = gachaStrategy.performGacha(gachaFactorEntity);
         log.info("gachaFactorEntity={}", JSON.toJSONString(gachaFactorEntity) );
         log.info("gachaAwardEntity={}", JSON.toJSONString(gachaAwardEntity));
@@ -47,5 +55,16 @@ public class GachaTest {
         GachaAwardEntity gachaAwardEntity = gachaStrategy.performGacha(gachaFactorEntity);
         log.info("gachaFactorEntity={}", JSON.toJSONString(gachaFactorEntity) );
         log.info("gachaAwardEntity={}", JSON.toJSONString(gachaAwardEntity));
+    }
+    @Test
+    public void test_performGacha_lock() {
+        GachaFactorEntity gachaFactorEntity = new GachaFactorEntity();
+        gachaFactorEntity.setStrategyId(100001L);
+        gachaFactorEntity.setUserId("hzx");
+        for(int i=0;i<5;i++){
+            GachaAwardEntity gachaAwardEntity = gachaStrategy.performGacha(gachaFactorEntity);
+            log.info("gachaFactorEntity={}", JSON.toJSONString(gachaFactorEntity) );
+            log.info("gachaAwardEntity={}", JSON.toJSONString(gachaAwardEntity));
+        }
     }
 }

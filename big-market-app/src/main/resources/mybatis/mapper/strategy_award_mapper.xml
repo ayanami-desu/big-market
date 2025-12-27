@@ -24,4 +24,10 @@
         WHERE strategy_id = #{strategyId}
     </select>
 
+    <select id="queryStrategyAwardRuleModels"  resultMap="dataMap">
+        SELECT rule_models
+        FROM strategy_award
+        WHERE strategy_id = #{strategyId} AND award_id=#{awardId}
+    </select>
+
 </mapper>

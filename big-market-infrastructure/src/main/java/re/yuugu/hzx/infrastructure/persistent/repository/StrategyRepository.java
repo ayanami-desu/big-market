@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import re.yuugu.hzx.domain.strategy.model.entity.StrategyAwardEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.StrategyEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.StrategyRuleEntity;
+import re.yuugu.hzx.domain.strategy.model.vo.StrategyAwardRuleModelVO;
 import re.yuugu.hzx.domain.strategy.po.AliasTable;
 import re.yuugu.hzx.domain.strategy.repository.IStrategyRepository;
 import re.yuugu.hzx.infrastructure.persistent.dao.IStrategyAwardDao;
@@ -124,8 +125,26 @@ public class StrategyRepository implements IStrategyRepository {
         strategyRuleReq.setStrategyId(strategyId);
         strategyRuleReq.setRuleModel(ruleModel);
         strategyRuleReq.setAwardId(awardId);
-        StrategyRule s = strategyRuleDao.queryStrategyRule(strategyRuleReq);
-        redisService.setValue(cacheKey,s.getRuleValue());
-        return s.getRuleValue();
+        StrategyRule res = strategyRuleDao.queryStrategyRuleValue(strategyRuleReq);
+        redisService.setValue(cacheKey,res.getRuleValue());
+        return res.getRuleValue();
+    }
+
+    @Override
+    public StrategyAwardRuleModelVO queryStrategyAwardRuleModelVO(Long strategyId, Integer gachaAwardId) {
+        String cacheKey = Constants.RedisKeys.STRATEGY_AWARD_RULE_MODELS
+                + strategyId
+                + "_" + gachaAwardId;
+        String models = redisService.getValue(cacheKey);
+        if(models!=null){
+            return StrategyAwardRuleModelVO.builder()
+                    .value(models)
+                    .build();
+        }
+        StrategyAward res =  strategyAwardDao.queryStrategyAwardRuleModels(strategyId,gachaAwardId);
+        redisService.setValue(cacheKey,res.getRuleModels());
+        return StrategyAwardRuleModelVO.builder()
+                .value(res.getRuleModels())
+                .build();
     }
 }

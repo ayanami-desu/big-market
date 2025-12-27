@@ -15,4 +15,6 @@ import lombok.NoArgsConstructor;
 public class GachaFactorEntity {
     private String userId;
     private Long strategyId;
+    /** 用于抽奖中的规则 */
+    private Integer awardId;
 }

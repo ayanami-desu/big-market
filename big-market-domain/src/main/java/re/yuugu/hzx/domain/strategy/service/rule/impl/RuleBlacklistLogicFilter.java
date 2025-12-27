@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import re.yuugu.hzx.domain.strategy.model.entity.RuleActionEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.RuleDetailEntity;
-import re.yuugu.hzx.domain.strategy.model.vo.RuleActionType;
+import re.yuugu.hzx.domain.strategy.model.vo.RuleActionVO;
 import re.yuugu.hzx.domain.strategy.repository.IStrategyRepository;
 import re.yuugu.hzx.domain.strategy.service.annotation.LogicStrategy;
 import re.yuugu.hzx.domain.strategy.service.rule.ILogicFilter;
@@ -33,8 +33,8 @@ public class RuleBlacklistLogicFilter implements ILogicFilter<RuleActionEntity.B
             if (userId.equals(s)){
                 log.info("匹配到黑名单规则");
                 return RuleActionEntity.<RuleActionEntity.BeforeGachaEntity>builder()
-                        .code(RuleActionType.TAKE_OVER.getCode())
-                        .info(RuleActionType.TAKE_OVER.getInfo())
+                        .code(RuleActionVO.TAKE_OVER.getCode())
+                        .info(RuleActionVO.TAKE_OVER.getInfo())
                         .ruleModel(DefaultLogicFactory.LogicModel.RULE_BLACKLIST.getCode())
                         .data(RuleActionEntity.BeforeGachaEntity.builder()
                                 .strategyId(ruleDetailEntity.getStrategyId())

@@ -6,16 +6,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import re.yuugu.hzx.domain.strategy.model.entity.RuleActionEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.RuleDetailEntity;
-import re.yuugu.hzx.domain.strategy.model.entity.StrategyEntity;
-import re.yuugu.hzx.domain.strategy.model.entity.StrategyRuleEntity;
-import re.yuugu.hzx.domain.strategy.model.vo.RuleActionType;
+import re.yuugu.hzx.domain.strategy.model.vo.RuleActionVO;
 import re.yuugu.hzx.domain.strategy.repository.IStrategyRepository;
 import re.yuugu.hzx.domain.strategy.service.annotation.LogicStrategy;
 import re.yuugu.hzx.domain.strategy.service.rule.ILogicFilter;
 import re.yuugu.hzx.domain.strategy.service.rule.factory.DefaultLogicFactory;
 import re.yuugu.hzx.types.common.Constants;
-import re.yuugu.hzx.types.enums.ResponseCode;
-import re.yuugu.hzx.types.exception.AppException;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -47,8 +43,8 @@ public class RuleWeightLogicFilter implements ILogicFilter<RuleActionEntity.Befo
         }
         log.info("权重范围规则匹配成功, key:{}",matched);
         return RuleActionEntity.<RuleActionEntity.BeforeGachaEntity>builder()
-                .code(RuleActionType.TAKE_OVER.getCode())
-                .info(RuleActionType.TAKE_OVER.getInfo())
+                .code(RuleActionVO.TAKE_OVER.getCode())
+                .info(RuleActionVO.TAKE_OVER.getInfo())
                 .ruleModel(DefaultLogicFactory.LogicModel.RULE_WIGHT.getCode())
                 .data(RuleActionEntity.BeforeGachaEntity.builder()
                         .strategyId(ruleDetailEntity.getStrategyId())

@@ -1,6 +1,7 @@
 package re.yuugu.hzx.domain.strategy.service.rule.chain.factory;
 
 
+import lombok.*;
 import org.springframework.stereotype.Service;
 import re.yuugu.hzx.domain.strategy.model.entity.StrategyEntity;
 import re.yuugu.hzx.domain.strategy.repository.IStrategyRepository;
@@ -38,5 +39,26 @@ public class DefaultLogicChainFactory {
         // 将最后一个设置为默认责任链
         cur.appendNext(logicChainGroup.get("default"));
         return logicChain;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public enum LogicChainType {
+        RULE_DEFAULT("rule_default","兜底责任链"),
+        RULE_BLACKLIST("rule_blacklist","黑名单规则"),
+        RULE_WEIGHT("rule_weight","权重范围规则")
+        ;
+
+        private final String code;
+        private final String info;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class ChainAwardVO{
+        Integer awardId;
+        LogicChainType logicChainType;
     }
 }

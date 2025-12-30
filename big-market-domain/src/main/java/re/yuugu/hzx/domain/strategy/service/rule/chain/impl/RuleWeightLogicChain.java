@@ -3,10 +3,10 @@ package re.yuugu.hzx.domain.strategy.service.rule.chain.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import re.yuugu.hzx.domain.strategy.model.entity.RuleActionEntity;
 import re.yuugu.hzx.domain.strategy.repository.IStrategyRepository;
 import re.yuugu.hzx.domain.strategy.service.armory.IStrategyArmory;
 import re.yuugu.hzx.domain.strategy.service.rule.chain.AbstractLoginChain;
+import re.yuugu.hzx.domain.strategy.service.rule.chain.factory.DefaultLogicChainFactory;
 import re.yuugu.hzx.types.common.Constants;
 
 import javax.annotation.Resource;
@@ -24,7 +24,7 @@ public class RuleWeightLogicChain extends AbstractLoginChain {
     public Long userPoint=0L;
 
     @Override
-    public Integer logic(Long strategyId, String userId) {
+    public DefaultLogicChainFactory.ChainAwardVO logic(Long strategyId, String userId) {
         log.info("责任链-权重范围: strategyId:{},userId:{}",strategyId,userId);
         String ruleValue = strategyRepository.queryStrategyRuleValue(strategyId,ruleModel(),null);
         TreeMap<Long,String> map = getRuleWeights(ruleValue);
@@ -37,7 +37,10 @@ public class RuleWeightLogicChain extends AbstractLoginChain {
             return getNext().logic(strategyId,userId);
         }
         log.info("责任链-权重范围:接管, weight_key:{}",matched);
-        return strategyArmory.getRandomAwardId(String.valueOf(strategyId),map.get(matched));
+        return DefaultLogicChainFactory.ChainAwardVO.builder()
+                .awardId(strategyArmory.getRandomAwardId(String.valueOf(strategyId),map.get(matched)))
+                .logicChainType(DefaultLogicChainFactory.LogicChainType.RULE_WEIGHT)
+                .build();
     }
 
     @Override

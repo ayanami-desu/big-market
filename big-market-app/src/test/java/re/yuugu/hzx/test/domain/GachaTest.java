@@ -11,10 +11,11 @@ import org.springframework.test.util.ReflectionTestUtils;
 import re.yuugu.hzx.domain.strategy.model.entity.GachaAwardEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.GachaFactorEntity;
 import re.yuugu.hzx.domain.strategy.service.IGachaStrategy;
-import javax.annotation.Resource;
-
 import re.yuugu.hzx.domain.strategy.service.rule.chain.impl.RuleWeightLogicChain;
-import re.yuugu.hzx.domain.strategy.service.rule.filter.impl.RuleLockLogicFilter;
+import re.yuugu.hzx.domain.strategy.service.rule.tree.impl.RuleLockTreeNode;
+import re.yuugu.hzx.domain.strategy.service.rule.tree.impl.RuleStockTreeNode;
+
+import javax.annotation.Resource;
 
 
 @Slf4j
@@ -27,15 +28,21 @@ public class GachaTest {
     @Resource
     private RuleWeightLogicChain ruleWeightLogicChain;
     @Resource
-    private RuleLockLogicFilter ruleLockLogicFilter;
+    private RuleLockTreeNode ruleLockLogicFilter;
+    @Resource
+    private RuleStockTreeNode ruleStockTreeNode;
 
     @Before
     public void setUserPoint(){
-        ReflectionTestUtils.setField(ruleWeightLogicChain,"userPoint",6001L);
+        ReflectionTestUtils.setField(ruleWeightLogicChain,"userPoint",2000L);
     }
     @Before
     public void setUserGachaCount(){
-        ReflectionTestUtils.setField(ruleLockLogicFilter,"userGachaCount",3L);
+        ReflectionTestUtils.setField(ruleLockLogicFilter,"userGachaCount",0L);
+    }
+    @Before
+    public void setStockCount(){
+        ReflectionTestUtils.setField(ruleStockTreeNode,"stockNum",0L);
     }
 
     @Test
@@ -61,7 +68,7 @@ public class GachaTest {
         GachaFactorEntity gachaFactorEntity = new GachaFactorEntity();
         gachaFactorEntity.setStrategyId(100001L);
         gachaFactorEntity.setUserId("hzx");
-        for(int i=0;i<5;i++){
+        for(int i=0;i<1;i++){
             GachaAwardEntity gachaAwardEntity = gachaStrategy.performGacha(gachaFactorEntity);
             log.info("gachaFactorEntity={}", JSON.toJSONString(gachaFactorEntity) );
             log.info("gachaAwardEntity={}", JSON.toJSONString(gachaAwardEntity));

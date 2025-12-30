@@ -3,6 +3,7 @@ package re.yuugu.hzx.domain.strategy.repository;
 import re.yuugu.hzx.domain.strategy.model.entity.StrategyAwardEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.StrategyEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.StrategyRuleEntity;
+import re.yuugu.hzx.domain.strategy.model.vo.RuleTreeVO;
 import re.yuugu.hzx.domain.strategy.model.vo.StrategyAwardRuleModelVO;
 import re.yuugu.hzx.domain.strategy.po.AliasTable;
 
@@ -27,4 +28,6 @@ public interface IStrategyRepository {
      * 查询strategy_award表，获得rule_models的值
      */
     StrategyAwardRuleModelVO queryStrategyAwardRuleModelVO(Long strategyId, Integer gachaAwardId);
+
+    RuleTreeVO queryRuleTreeByRootNode(String rootNode);
 }

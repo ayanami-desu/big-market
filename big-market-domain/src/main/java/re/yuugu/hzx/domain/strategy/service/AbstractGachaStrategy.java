@@ -4,28 +4,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import re.yuugu.hzx.domain.strategy.model.entity.GachaAwardEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.GachaFactorEntity;
-import re.yuugu.hzx.domain.strategy.model.entity.RuleActionEntity;
-import re.yuugu.hzx.domain.strategy.model.vo.RuleActionVO;
-import re.yuugu.hzx.domain.strategy.model.vo.StrategyAwardRuleModelVO;
-import re.yuugu.hzx.domain.strategy.repository.IStrategyRepository;
-import re.yuugu.hzx.domain.strategy.service.armory.IStrategyArmory;
-import re.yuugu.hzx.domain.strategy.service.rule.chain.ILogicChain;
 import re.yuugu.hzx.domain.strategy.service.rule.chain.factory.DefaultLogicChainFactory;
+import re.yuugu.hzx.domain.strategy.service.rule.tree.factory.DefaultRuleTreeFactory;
 import re.yuugu.hzx.types.enums.ResponseCode;
 import re.yuugu.hzx.types.exception.AppException;
 
 @Slf4j
 public abstract class AbstractGachaStrategy implements IGachaStrategy {
 
-    protected IStrategyRepository strategyRepository;
-    protected IStrategyArmory strategyArmory;
-    protected DefaultLogicChainFactory defaultLogicChainFactory;
-
-    public AbstractGachaStrategy(IStrategyRepository strategyRepository, IStrategyArmory strategyArmory, DefaultLogicChainFactory defaultLogicChainFactory) {
-        this.strategyRepository = strategyRepository;
-        this.strategyArmory = strategyArmory;
-        this.defaultLogicChainFactory=defaultLogicChainFactory;
-    }
+//    protected IStrategyRepository strategyRepository;
+//    protected IStrategyArmory strategyArmory;
+//    protected DefaultLogicChainFactory defaultLogicChainFactory;
+//
+//    public AbstractGachaStrategy(IStrategyRepository strategyRepository, IStrategyArmory strategyArmory, DefaultLogicChainFactory defaultLogicChainFactory) {
+//        this.strategyRepository = strategyRepository;
+//        this.strategyArmory = strategyArmory;
+//        this.defaultLogicChainFactory=defaultLogicChainFactory;
+//    }
 
     @Override
     public GachaAwardEntity performGacha(GachaFactorEntity gachaFactor) {
@@ -36,27 +31,23 @@ public abstract class AbstractGachaStrategy implements IGachaStrategy {
             throw new AppException(ResponseCode.ILLEGAL_PARAMETER.getCode(), ResponseCode.ILLEGAL_PARAMETER.getInfo());
         }
         // 2. 责任链处理黑名单、权重范围
-        ILogicChain logicChain=defaultLogicChainFactory.openLogicChain(strategyId);
-        Integer gachaAwardId = logicChain.logic(strategyId,userId);
-
-        gachaFactor.setAwardId(gachaAwardId);
-        // 3. 查询该奖品配置了哪些规则
-        StrategyAwardRuleModelVO strategyAwardRuleModelVO = strategyRepository.queryStrategyAwardRuleModelVO(strategyId,gachaAwardId);
-
-        // 4. 抽奖中规则过滤
-        RuleActionEntity<RuleActionEntity.ProcessingGachaEntity> ruleActionProcessingEntity = this.doCheckProcessingGacha(gachaFactor, strategyAwardRuleModelVO.gachaProcessingRule());
-        if (RuleActionVO.TAKE_OVER.getCode().equals(ruleActionProcessingEntity.getCode())){
-            log.info("匹配到rule_lock规则");
+        DefaultLogicChainFactory.ChainAwardVO chainAwardVO = processLogicChain(strategyId,userId);
+        if(!DefaultLogicChainFactory.LogicChainType.RULE_DEFAULT.getCode().equals(chainAwardVO.getLogicChainType().getCode())){
+            log.info(chainAwardVO.getLogicChainType().getCode());
             return GachaAwardEntity.builder()
-                    .awardDesc("兜底奖品")
+                    .awardId(chainAwardVO.getAwardId())
+                    .awardDesc("直接发奖品")
                     .build();
         }
-
+        //3. 规则树处理次数锁，库存，兜底奖品
+        DefaultRuleTreeFactory.TreeAwardVO treeAwardVO = processLogicTree(strategyId,userId,chainAwardVO.getAwardId());
         return GachaAwardEntity.builder()
-                .awardId(gachaAwardId)
+                .awardId(treeAwardVO.getAwardId())
+                .awardConfig(treeAwardVO.getAwardConfig())
+                .awardDesc("")
                 .build();
-    }
 
-    protected abstract RuleActionEntity<RuleActionEntity.BeforeGachaEntity> doCheckBeforeGacha(GachaFactorEntity gachaFactor, String... logics);
-    protected abstract RuleActionEntity<RuleActionEntity.ProcessingGachaEntity> doCheckProcessingGacha(GachaFactorEntity gachaFactor, String... logics);
+    }
+    protected abstract DefaultLogicChainFactory.ChainAwardVO processLogicChain(Long strategyId,String userId);
+    protected abstract DefaultRuleTreeFactory.TreeAwardVO processLogicTree(Long strategyId,String userId,Integer awardId);
 }

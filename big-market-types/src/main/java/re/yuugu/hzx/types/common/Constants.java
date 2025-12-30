@@ -12,6 +12,7 @@ public class Constants {
         public static final String STRATEGY_AWARD_ALIAS_KEY = "big_market_strategy_alias_";
         public static final String STRATEGY_RULE_VALUE_KEY = "big_market_strategy_rule_value_";
         public static final String STRATEGY_AWARD_RULE_MODELS = "big_market_strategy_award_rule_models_";
+        public static final String STRATEGY_RULE_TREE_VO = "big_market_strategy_rule_tree_vo_";
     }
 
 }

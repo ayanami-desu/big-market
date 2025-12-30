@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="re.yuugu.hzx.infrastructure.persistent.dao.IRuleTreeNodeDao">
+
+    <resultMap id="dataMap" type="re.yuugu.hzx.infrastructure.persistent.po.RuleTreeNode">
+        <id column="id" property="id"/>
+        <result column="tree_id" property="treeId"/>
+        <result column="node_id" property="nodeId"/>
+        <result column="rule_key" property="ruleKey"/>
+        <result column="rule_desc" property="ruleDesc"/>
+        <result column="rule_value" property="ruleValue"/>
+    </resultMap>
+
+    <select id="queryNodeListByTreeId" resultMap="dataMap">
+        SELECT tree_id,node_id,rule_key,rule_desc,rule_value
+        FROM rule_tree_node
+        where tree_id=#{treeId}
+    </select>
+
+</mapper>

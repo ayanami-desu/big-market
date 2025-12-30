@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="re.yuugu.hzx.infrastructure.persistent.dao.IRuleTreeEdgeDao">
+
+    <resultMap id="dataMap" type="re.yuugu.hzx.infrastructure.persistent.po.RuleTreeEdge">
+        <id column="id" property="id"/>
+        <result column="edge_id" property="edgeId"/>
+        <result column="tree_id" property="treeId"/>
+        <result column="node_from" property="ruleNodeFrom"/>
+        <result column="node_to" property="ruleNodeTo"/>
+        <result column="compare_op" property="ruleTreeEdgeCompOp"/>
+        <result column="rule_action" property="ruleAction"/>
+
+    </resultMap>
+
+    <select id="queryEdgeListByTreeId" resultMap="dataMap">
+        SELECT edge_id,tree_id,node_from,node_to,compare_op,rule_action
+        FROM rule_tree_edge
+        where tree_id=#{TreeId}
+    </select>
+
+</mapper>

@@ -1,6 +1,8 @@
 package re.yuugu.hzx.infrastructure.persistent.repository;
 
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RBlockingQueue;
+import org.redisson.api.RDelayedQueue;
 import org.springframework.stereotype.Repository;
 import re.yuugu.hzx.domain.strategy.model.entity.StrategyAwardEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.StrategyEntity;
@@ -18,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Repository
@@ -208,5 +211,52 @@ public class StrategyRepository implements IStrategyRepository {
         redisService.setValue(cacheKey, ruleTreeVO);
         // 3. 返回树
         return ruleTreeVO;
+    }
+
+    @Override
+    public void cacheStrategyAwardSurplusCount(Long strategyId, Integer awardId, Integer awardCountSurplus) {
+        String cacheKey = Constants.RedisKeys.STRATEGY_AWARD_SURPLUS_COUNT + strategyId + "_" + awardId;
+        if(redisService.isExists(cacheKey)){
+            return;
+        }
+        redisService.setAtomicLong(cacheKey, awardCountSurplus);
+    }
+
+    @Override
+    public boolean subtractAwardStock(Long strategyId, Integer awardId) {
+        String cacheKey = Constants.RedisKeys.STRATEGY_AWARD_SURPLUS_COUNT + strategyId + "_" + awardId;
+        long surplus = redisService.decr(cacheKey);
+        if (surplus < 0) {
+            log.info("库存不足");
+            return false;
+        }
+        //加锁
+        String lockKey = Constants.RedisKeys.STRATEGY_AWARD_COUNT_NX_LOCK + strategyId + "_" + awardId;
+        boolean lock = redisService.setNX(lockKey);
+        if (!lock) {
+            log.info("出现异常：对库存上锁失败");
+        }
+        return lock;
+    }
+
+    @Override
+    public void sendConsumeAwardStock(StrategyAwardStockKeyVO strategyAwardStockKeyVO) {
+        String cacheKey = Constants.RedisKeys.STRATEGY_AWARD_STOCK_QUEUE;
+        RBlockingQueue<StrategyAwardStockKeyVO> blockingQueue = redisService.getBlockingQueue(cacheKey);
+        RDelayedQueue<StrategyAwardStockKeyVO> delayedQueue = redisService.getDelayedQueue(blockingQueue);
+        // 3s 后再加入队列
+        delayedQueue.offer(strategyAwardStockKeyVO, 3, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public StrategyAwardStockKeyVO offerStrategyAwardQueueValue() throws InterruptedException {
+        String cacheKey = Constants.RedisKeys.STRATEGY_AWARD_STOCK_QUEUE;
+        RBlockingQueue<StrategyAwardStockKeyVO> blockingQueue = redisService.getBlockingQueue(cacheKey);
+        return blockingQueue.take();
+    }
+
+    @Override
+    public void updateStrategyAwardStock(Long strategyId, Integer awardId) {
+        strategyAwardDao.updateStrategyAwardStock(strategyId, awardId);
     }
 }

@@ -1,6 +1,5 @@
 package re.yuugu.hzx.domain.strategy.service.rule.tree.engine;
 
-import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import re.yuugu.hzx.domain.strategy.model.vo.RuleActionVO;
 import re.yuugu.hzx.domain.strategy.model.vo.RuleTreeEdgeVO;
@@ -62,14 +61,11 @@ public class DecisionTreeEngine implements IDecisionTreeEngine {
                 return edge.getRuleNodeTo();
             }
         }
-        log.info(JSON.toJSONString(edges));
-        log.info(JSON.toJSONString(action));
         throw new RuntimeException("决策树-引擎：规则配置有误");
     }
     private boolean decisionLogic(String actionCode, RuleTreeEdgeVO nodeLine) {
         switch (nodeLine.getRuleTreeEdgeCompOp()) {
             case EQUAL:
-                log.info("return true");
                 return actionCode.equals(nodeLine.getRuleAction().getCode());
             // 以下规则暂时不需要实现
             case GT:
@@ -77,7 +73,6 @@ public class DecisionTreeEngine implements IDecisionTreeEngine {
             case GE:
             case LE:
             default:
-                log.info("return false");
                 return false;
         }
     }

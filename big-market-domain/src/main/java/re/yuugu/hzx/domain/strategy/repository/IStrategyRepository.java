@@ -5,6 +5,7 @@ import re.yuugu.hzx.domain.strategy.model.entity.StrategyEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.StrategyRuleEntity;
 import re.yuugu.hzx.domain.strategy.model.vo.RuleTreeVO;
 import re.yuugu.hzx.domain.strategy.model.vo.StrategyAwardRuleModelVO;
+import re.yuugu.hzx.domain.strategy.model.vo.StrategyAwardStockKeyVO;
 import re.yuugu.hzx.domain.strategy.po.AliasTable;
 
 import java.util.List;
@@ -30,4 +31,14 @@ public interface IStrategyRepository {
     StrategyAwardRuleModelVO queryStrategyAwardRuleModelVO(Long strategyId, Integer gachaAwardId);
 
     RuleTreeVO queryRuleTreeByRootNode(String rootNode);
+
+    void cacheStrategyAwardSurplusCount(Long strategyId, Integer awardId, Integer awardCountSurplus);
+
+    boolean subtractAwardStock(Long strategyId, Integer awardId);
+
+    void sendConsumeAwardStock(StrategyAwardStockKeyVO strategyAwardStockKeyVO);
+
+    StrategyAwardStockKeyVO offerStrategyAwardQueueValue() throws InterruptedException;
+
+    void updateStrategyAwardStock(Long strategyId, Integer awardId);
 }

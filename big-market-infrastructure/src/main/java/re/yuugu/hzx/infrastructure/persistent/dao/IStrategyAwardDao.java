@@ -11,4 +11,6 @@ public interface IStrategyAwardDao {
     List<StrategyAward> queryStrategyAwardListByStrategyId(Long strategyId);
 
     StrategyAward queryStrategyAwardRuleModels(@Param("strategyId") Long strategyId, @Param("awardId")Integer gachaAwardId);
+
+    void updateStrategyAwardStock(@Param("strategyId") Long strategyId, @Param("awardId")Integer awardId);
 }

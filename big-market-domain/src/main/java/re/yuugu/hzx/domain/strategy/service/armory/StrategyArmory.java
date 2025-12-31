@@ -28,9 +28,13 @@ public class StrategyArmory implements IStrategyArmory {
 
     @Override
     public boolean assembleLotteryStrategy(Long strategyId) {
-
-        // 查询策略配置，即某个抽奖策略中有哪些奖品，其概率、数量、排序等信息
+        // 1. 查询策略配置，即某个抽奖策略中有哪些奖品，其概率、数量、排序等信息
         List<StrategyAwardEntity> strategyAwardEntities = repository.queryStrategyAwardList(strategyId);
+        //2. 缓存奖品剩余数量
+        for(StrategyAwardEntity strategyAwardEntity : strategyAwardEntities){
+            repository.cacheStrategyAwardSurplusCount(strategyId,strategyAwardEntity.getAwardId(),strategyAwardEntity.getAwardCountSurplus());
+        }
+
         assembleOneStrategy(String.valueOf(strategyId), strategyAwardEntities);
 
         StrategyEntity strategyEntity = repository.queryStrategyEntityByStrategyId(strategyId);

@@ -19,12 +19,11 @@ public class StrategyArmoryTest {
     @Resource
     private IStrategyArmory strategyArmory;
 
-    @Test
     @Before
     public void test_assembleLotteryStrategy() {
         if (!strategyArmory.assembleLotteryStrategy(100001L)){
             throw new RuntimeException();
-        };
+        }
     }
     @Test
     public void test_getRandomAwardId() {

@@ -14,9 +14,10 @@ import re.yuugu.hzx.domain.strategy.service.rule.tree.factory.DefaultRuleTreeFac
 @Slf4j
 @Component("rule_lock")
 public class RuleLockTreeNode implements ILogicTreeNode {
-    public Long userGachaCount =0L;
+    public Long userGachaCount =10L;
     @Override
     public DefaultRuleTreeFactory.RuleTreeAction logic(String userId, Long strategyId, Integer awardId,String ruleValue) {
+        log.info("规则树-抽奖次数锁");
         long cnt = Long.parseLong(ruleValue);
         if(cnt>userGachaCount){
             return DefaultRuleTreeFactory.RuleTreeAction.builder()

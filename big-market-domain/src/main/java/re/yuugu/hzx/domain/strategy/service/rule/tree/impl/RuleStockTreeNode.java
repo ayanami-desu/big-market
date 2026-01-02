@@ -23,6 +23,7 @@ public class RuleStockTreeNode implements ILogicTreeNode {
 
     @Override
     public DefaultRuleTreeFactory.RuleTreeAction logic(String userId, Long strategyId, Integer awardId,String ruleValue) {
+        log.info("规则树-库存");
         boolean status = strategyRepository.subtractAwardStock(strategyId,awardId);
         if(status){
             //发送扣减库存消息

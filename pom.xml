@@ -120,6 +120,11 @@
                 <artifactId>redisson-spring-boot-starter</artifactId>
                 <version>3.23.4</version>
             </dependency>
+            <dependency>
+                <groupId>jakarta.validation</groupId>
+                <artifactId>jakarta.validation-api</artifactId>
+                <version>3.0.2</version>
+            </dependency>
 
             <!-- 工程模块 -->
             <dependency>

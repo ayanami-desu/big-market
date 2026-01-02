@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import re.yuugu.hzx.domain.strategy.model.entity.GachaAwardEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.GachaFactorEntity;
+import re.yuugu.hzx.domain.strategy.repository.IStrategyRepository;
 import re.yuugu.hzx.domain.strategy.service.rule.chain.factory.DefaultLogicChainFactory;
 import re.yuugu.hzx.domain.strategy.service.rule.tree.factory.DefaultRuleTreeFactory;
 import re.yuugu.hzx.types.enums.ResponseCode;
@@ -11,16 +12,15 @@ import re.yuugu.hzx.types.exception.AppException;
 
 @Slf4j
 public abstract class AbstractGachaStrategy implements IGachaStrategy {
+    protected IStrategyRepository strategyRepository;
+    protected DefaultLogicChainFactory defaultLogicChainFactory;
+    protected DefaultRuleTreeFactory defaultRuleTreeFactory;
 
-//    protected IStrategyRepository strategyRepository;
-//    protected IStrategyArmory strategyArmory;
-//    protected DefaultLogicChainFactory defaultLogicChainFactory;
-//
-//    public AbstractGachaStrategy(IStrategyRepository strategyRepository, IStrategyArmory strategyArmory, DefaultLogicChainFactory defaultLogicChainFactory) {
-//        this.strategyRepository = strategyRepository;
-//        this.strategyArmory = strategyArmory;
-//        this.defaultLogicChainFactory=defaultLogicChainFactory;
-//    }
+    public AbstractGachaStrategy(IStrategyRepository strategyRepository, DefaultLogicChainFactory defaultLogicChainFactory,DefaultRuleTreeFactory defaultRuleTreeFactory) {
+        this.strategyRepository = strategyRepository;
+        this.defaultLogicChainFactory=defaultLogicChainFactory;
+        this.defaultRuleTreeFactory = defaultRuleTreeFactory;
+    }
 
     @Override
     public GachaAwardEntity performGacha(GachaFactorEntity gachaFactor) {
@@ -44,7 +44,7 @@ public abstract class AbstractGachaStrategy implements IGachaStrategy {
         return GachaAwardEntity.builder()
                 .awardId(treeAwardVO.getAwardId())
                 .awardConfig(treeAwardVO.getAwardConfig())
-                .awardDesc("")
+                .awardDesc("最终奖品")
                 .build();
 
     }

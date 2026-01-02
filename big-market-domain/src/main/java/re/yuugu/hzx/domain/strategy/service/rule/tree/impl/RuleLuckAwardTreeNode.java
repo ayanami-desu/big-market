@@ -17,6 +17,7 @@ import re.yuugu.hzx.types.common.Constants;
 public class RuleLuckAwardTreeNode implements ILogicTreeNode {
     @Override
     public DefaultRuleTreeFactory.RuleTreeAction logic(String userId, Long strategyId, Integer awardId,String ruleValue) {
+        log.info("规则树-兜底奖品");
         int l,r;
         String[] parts = ruleValue.split(Constants.COMMA);
         l = Integer.parseInt(parts[0]);

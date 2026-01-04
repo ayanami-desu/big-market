@@ -1,4 +1,4 @@
-package re.yuugu.hzx.domain.strategy.service.Gacha;
+package re.yuugu.hzx.domain.strategy.service.gacha;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

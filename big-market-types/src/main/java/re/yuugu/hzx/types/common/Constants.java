@@ -14,8 +14,11 @@ public class Constants {
         public static final String STRATEGY_AWARD_RULE_MODELS = "big_market_strategy_award_rule_models_";
         public static final String STRATEGY_RULE_TREE_VO = "big_market_strategy_rule_tree_vo_";
         public static final String STRATEGY_AWARD_SURPLUS_COUNT = "big_market_strategy_award_surplus_count_";
-        public static final String STRATEGY_AWARD_COUNT_NX_LOCK = "big_market_strategy_award_count_nx_lock_";
         public static final String STRATEGY_AWARD_STOCK_QUEUE = "big_market_strategy_award_stock_queue_";
+
+        public static final String ACTIVITY_SKU_KEY="big_market_activity_sku_key_";
+        public static final String ACTIVITY_ACTIVITY_KEY = "big_market_activity_activity_key_";
+        public static final String ACTIVITY_ACTIVITY_COUNT_ID="big_market_activity_activity_count_id_";
     }
 
 }

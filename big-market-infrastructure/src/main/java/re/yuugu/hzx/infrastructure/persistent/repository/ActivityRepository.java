@@ -1,19 +1,22 @@
 package re.yuugu.hzx.infrastructure.persistent.repository;
 
+import cn.bugstack.middleware.db.router.strategy.IDBRouterStrategy;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.support.TransactionTemplate;
+import re.yuugu.hzx.domain.acitivity.model.aggregate.CreateOrderAggregate;
 import re.yuugu.hzx.domain.acitivity.model.entity.ActivityCountEntity;
 import re.yuugu.hzx.domain.acitivity.model.entity.ActivityEntity;
+import re.yuugu.hzx.domain.acitivity.model.entity.ActivityOrderEntity;
 import re.yuugu.hzx.domain.acitivity.model.entity.ActivitySkuEntity;
 import re.yuugu.hzx.domain.acitivity.repository.IActivityRepository;
-import re.yuugu.hzx.infrastructure.persistent.dao.IGachaActivityCountDao;
-import re.yuugu.hzx.infrastructure.persistent.dao.IGachaActivityDao;
-import re.yuugu.hzx.infrastructure.persistent.dao.IGachaActivitySkuDao;
-import re.yuugu.hzx.infrastructure.persistent.po.GachaActivity;
-import re.yuugu.hzx.infrastructure.persistent.po.GachaActivityCount;
-import re.yuugu.hzx.infrastructure.persistent.po.GachaActivitySku;
+import re.yuugu.hzx.infrastructure.persistent.dao.*;
+import re.yuugu.hzx.infrastructure.persistent.po.*;
 import re.yuugu.hzx.infrastructure.persistent.redis.IRedisService;
 import re.yuugu.hzx.types.common.Constants;
+import re.yuugu.hzx.types.enums.ResponseCode;
+import re.yuugu.hzx.types.exception.AppException;
 
 import javax.annotation.Resource;
 
@@ -32,7 +35,15 @@ public class ActivityRepository implements IActivityRepository {
     @Resource
     private IGachaActivityDao activityDao;
     @Resource
+    private IGachaActivityAccountDao activityAccountDao;
+    @Resource
+    private IGachaActivityOrderDao  activityOrderDao;
+    @Resource
     private IRedisService redisService;
+    @Resource
+    private IDBRouterStrategy dbRouter;
+    @Resource
+    private TransactionTemplate  transactionTemplate;
 
     @Override
     public ActivitySkuEntity queryActivitySku(Long sku) {
@@ -88,5 +99,55 @@ public class ActivityRepository implements IActivityRepository {
                 .build();
         redisService.setValue(cacheKey, activityCountEntity);
         return activityCountEntity;
+    }
+
+    @Override
+    public void saveOrder(CreateOrderAggregate createOrderAggregate) {
+        try{
+            ActivityOrderEntity activityOrderEntity = createOrderAggregate.getActivityOrderEntity();
+            GachaActivityOrder gachaActivityOrder = new GachaActivityOrder();
+
+            gachaActivityOrder.setUserId(activityOrderEntity.getUserId());
+            gachaActivityOrder.setSku(activityOrderEntity.getSku());
+            gachaActivityOrder.setActivityId(activityOrderEntity.getActivityId());
+            gachaActivityOrder.setActivityName(activityOrderEntity.getActivityName());
+            gachaActivityOrder.setStrategyId(activityOrderEntity.getStrategyId());
+            gachaActivityOrder.setOrderId(activityOrderEntity.getOrderId());
+            gachaActivityOrder.setOrderTime(activityOrderEntity.getOrderTime());
+            gachaActivityOrder.setTotalCount(activityOrderEntity.getTotalCount());
+            gachaActivityOrder.setMonthCount(activityOrderEntity.getMonthCount());
+            gachaActivityOrder.setDayCount(activityOrderEntity.getDayCount());
+            gachaActivityOrder.setState(activityOrderEntity.getState());
+            gachaActivityOrder.setBizId(activityOrderEntity.getBizId());
+
+            GachaActivityAccount gachaActivityAccount =  new GachaActivityAccount();
+            gachaActivityAccount.setUserId(activityOrderEntity.getUserId());
+            gachaActivityAccount.setActivityId(activityOrderEntity.getActivityId());
+            gachaActivityAccount.setTotalCount(activityOrderEntity.getTotalCount());
+            gachaActivityAccount.setTotalCountSurplus(activityOrderEntity.getTotalCount());
+            gachaActivityAccount.setDayCount(activityOrderEntity.getDayCount());
+            gachaActivityAccount.setDayCountSurplus(activityOrderEntity.getDayCount());
+            gachaActivityAccount.setMonthCount(activityOrderEntity.getMonthCount());
+            gachaActivityAccount.setMonthCountSurplus(activityOrderEntity.getMonthCount());
+
+            dbRouter.doRouter(activityOrderEntity.getUserId());
+            transactionTemplate.execute(status -> {
+                try{
+                    //TODO 只要这里设置了，后面的方法都会自动进行分库。或许分表不一定？
+                    activityOrderDao.insert(gachaActivityOrder);
+                    int count = activityAccountDao.updateAccountQuota(gachaActivityAccount);
+                    if(count==0){
+                        activityAccountDao.insert(gachaActivityAccount);
+                    }
+                    return 1;
+                }catch (DuplicateKeyException e){
+                    status.setRollbackOnly();
+                    log.error("写入订单记录，唯一索引冲突");
+                    throw new AppException(ResponseCode.DUPLICATE_KEY_EXCEPTION.getCode(),ResponseCode.DUPLICATE_KEY_EXCEPTION.getInfo());
+                }
+            });
+        }finally {
+            dbRouter.clear();
+        }
     }
 }

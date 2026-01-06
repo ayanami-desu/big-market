@@ -18,14 +18,14 @@ import java.util.Date;
 @Builder
 public class ActivityOrderEntity {
     /**
-     * 自增 ID
-     */
-    private Long id;
-
-    /**
      * 用户 ID
      */
     private String userId;
+
+    /**
+     * 商品 sku
+     */
+    private Long sku;
 
     /**
      * 活动 ID
@@ -60,7 +60,7 @@ public class ActivityOrderEntity {
     /**
      * 月次数变化量
      */
-    private Integer mouthCount;
+    private Integer monthCount;
 
     /**
      * 日次数变化量
@@ -71,4 +71,9 @@ public class ActivityOrderEntity {
      * 订单状态
      */
     private String state;
+
+    /**
+     * 外部透传字段，保证订单唯一性
+     */
+    private String bizId;
 }

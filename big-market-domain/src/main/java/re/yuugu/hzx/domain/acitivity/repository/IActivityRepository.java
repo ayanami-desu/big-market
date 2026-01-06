@@ -1,5 +1,6 @@
 package re.yuugu.hzx.domain.acitivity.repository;
 
+import re.yuugu.hzx.domain.acitivity.model.aggregate.CreateOrderAggregate;
 import re.yuugu.hzx.domain.acitivity.model.entity.ActivityCountEntity;
 import re.yuugu.hzx.domain.acitivity.model.entity.ActivityEntity;
 import re.yuugu.hzx.domain.acitivity.model.entity.ActivitySkuEntity;
@@ -16,4 +17,6 @@ public interface IActivityRepository {
     ActivityEntity queryActivityById(Long activityId);
 
     ActivityCountEntity queryActivityCountByActivityCountId(Long activityCountId);
+
+    void saveOrder(CreateOrderAggregate createOrderAggregate);
 }

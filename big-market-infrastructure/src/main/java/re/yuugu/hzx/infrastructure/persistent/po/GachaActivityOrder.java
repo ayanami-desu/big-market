@@ -22,6 +22,11 @@ public class GachaActivityOrder {
     private String userId;
 
     /**
+     * 商品 sku
+     */
+    private Long sku;
+
+    /**
      * 活动 ID
      */
     private Long activityId;
@@ -54,7 +59,7 @@ public class GachaActivityOrder {
     /**
      * 月次数变化量
      */
-    private Integer mouthCount;
+    private Integer monthCount;
 
     /**
      * 日次数变化量
@@ -65,6 +70,11 @@ public class GachaActivityOrder {
      * 订单状态
      */
     private String state;
+
+    /**
+     * 外部透传字段，保证订单唯一性
+     */
+    private String bizId;
 
     /**
      * 创建时间

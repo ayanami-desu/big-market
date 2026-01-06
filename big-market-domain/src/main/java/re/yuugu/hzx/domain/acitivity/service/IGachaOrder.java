@@ -1,7 +1,6 @@
 package re.yuugu.hzx.domain.acitivity.service;
 
 import re.yuugu.hzx.domain.acitivity.model.entity.ActivityChargeEntity;
-import re.yuugu.hzx.domain.acitivity.model.entity.ActivityOrderEntity;
 
 /**
  * @ author anon
@@ -9,5 +8,5 @@ import re.yuugu.hzx.domain.acitivity.model.entity.ActivityOrderEntity;
  * @ create 2026/1/4 18:27
  */
 public interface IGachaOrder {
-    ActivityOrderEntity createGachaActivityOrder(ActivityChargeEntity activityChargeEntity);
+    String createGachaActivityOrder(ActivityChargeEntity activityChargeEntity);
 }

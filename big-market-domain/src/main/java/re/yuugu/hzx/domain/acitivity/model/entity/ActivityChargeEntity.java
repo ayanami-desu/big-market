@@ -17,4 +17,8 @@ import lombok.NoArgsConstructor;
 public class ActivityChargeEntity {
     private String userId;
     private Long sku;
+    /**
+     * 外部透传字段，保证订单唯一性
+     */
+    private String bizId;
 }

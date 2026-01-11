@@ -16,7 +16,7 @@ import re.yuugu.hzx.types.exception.AppException;
  * @ create 2026/1/4 19:10
  */
 @Slf4j
-public abstract class AbstractGachaActivity implements IGachaOrder {
+public abstract class AbstractGachaActivity implements IGachaOrder, ISkuStock {
     protected IActivityRepository activityRepository;
     protected DefaultActionChainFactory defaultActionChainFactory;
 

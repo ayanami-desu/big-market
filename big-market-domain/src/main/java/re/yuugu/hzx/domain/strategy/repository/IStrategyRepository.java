@@ -38,7 +38,7 @@ public interface IStrategyRepository {
 
     void sendConsumeAwardStock(StrategyAwardStockKeyVO strategyAwardStockKeyVO);
 
-    StrategyAwardStockKeyVO offerStrategyAwardQueueValue() throws InterruptedException;
+    StrategyAwardStockKeyVO offerStrategyAwardQueueValue();
 
     void updateStrategyAwardStock(Long strategyId, Integer awardId);
 }

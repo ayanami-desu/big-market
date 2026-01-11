@@ -60,6 +60,7 @@ public class StrategyRepository implements IStrategyRepository {
         List<StrategyAward> strategyAwards = strategyAwardDao.queryStrategyAwardListByStrategyId(strategyId);
         if(strategyAwards==null || strategyAwards.isEmpty()){
             log.error("未查询到奖品列表 strategyId:{}",strategyId);
+            return null;
         }
         strategyAwardEntities = new ArrayList<>();
         for (StrategyAward strategyAward : strategyAwards) {
@@ -262,10 +263,10 @@ public class StrategyRepository implements IStrategyRepository {
     }
 
     @Override
-    public StrategyAwardStockKeyVO offerStrategyAwardQueueValue() throws InterruptedException {
+    public StrategyAwardStockKeyVO offerStrategyAwardQueueValue() {
         String cacheKey = Constants.RedisKeys.STRATEGY_AWARD_STOCK_QUEUE;
         RBlockingQueue<StrategyAwardStockKeyVO> blockingQueue = redisService.getBlockingQueue(cacheKey);
-        return blockingQueue.take();
+        return blockingQueue.poll();
     }
 
     @Override

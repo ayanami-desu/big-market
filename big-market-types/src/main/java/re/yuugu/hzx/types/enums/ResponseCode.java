@@ -14,6 +14,9 @@ public enum ResponseCode {
     ILLEGAL_PARAMETER("0002", "非法参数"),
     STRATEGY_RULE_WEIGHT_IS_NULL("ERR_BIZ_001","业务异常，策略中存在rule_weight规则，但无具体值"),
     STRATEGY_NOT_CONFIGURED("ERR_BIZ_002","业务异常，未装配抽奖策略即调用抽奖方法"),
+    ACTIVITY_DATE_ERR("ERR_BIZ_003","未到活动时间或已超过活动时间"),
+    ACTIVITY_STATE_ERR("ERR_BIZ_004","活动状态异常"),
+    ACTIVITY_STOCK_ERR("ERR_BIZ_005","活动 sku 库存异常"),
     DUPLICATE_KEY_EXCEPTION("DuplicateKeyException","键值重复"),
     ;
 

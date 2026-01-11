@@ -11,4 +11,8 @@ import re.yuugu.hzx.infrastructure.persistent.po.GachaActivitySku;
 @Mapper
 public interface IGachaActivitySkuDao {
     GachaActivitySku queryGachaActivitySku(Long sku);
+
+    void updateSkuStock(Long sku);
+
+    void clearSkuStock(Long sku);
 }

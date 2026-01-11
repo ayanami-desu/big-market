@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import re.yuugu.hzx.domain.acitivity.model.aggregate.CreateOrderAggregate;
 import re.yuugu.hzx.domain.acitivity.model.entity.*;
 import re.yuugu.hzx.domain.acitivity.model.vo.OrderState;
+import re.yuugu.hzx.domain.acitivity.model.vo.SkuStockKeyVO;
 import re.yuugu.hzx.domain.acitivity.repository.IActivityRepository;
 import re.yuugu.hzx.domain.acitivity.service.rule.chain.factory.DefaultActionChainFactory;
 
@@ -55,5 +56,25 @@ public class GachaActivityService extends AbstractGachaActivity {
         CreateOrderAggregate createOrderAggregate = new CreateOrderAggregate();
         createOrderAggregate.setActivityOrderEntity(activityOrderEntity);
         return createOrderAggregate;
+    }
+
+    @Override
+    public SkuStockKeyVO takeQueueValue() {
+        return activityRepository.takeQueueValue();
+    }
+
+    @Override
+    public void clearQueueValue() {
+        activityRepository.clearQueueValue();
+    }
+
+    @Override
+    public void updateSkuStock(Long sku) {
+        activityRepository.updateSkuStock(sku);
+    }
+
+    @Override
+    public void clearSkuStock(Long sku) {
+        activityRepository.clearSkuStock(sku);
     }
 }

@@ -241,4 +241,14 @@ public interface IRedisService {
     void setAtomicLong(String key, Integer value);
 
     boolean setNX(String key);
+
+    /**
+     *
+     * @param key redis key
+     * @param expireTime 单位是毫秒
+     * @return 加锁是否成功
+     */
+    boolean setNX(String key, Long expireTime);
+
+    void clearBiz(String pattern);
 }

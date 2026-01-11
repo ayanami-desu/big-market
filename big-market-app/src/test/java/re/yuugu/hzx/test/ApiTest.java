@@ -19,11 +19,6 @@ public class ApiTest {
     private IRedisService  redisService;
 
     @Test
-    public void test() {
-        log.info("测试完成");
-    }
-
-    @Test
     public void test_redis() {
         RMap<Object, Object> map =  redisService.getMap("strategy_id_100001");
         map.put(1, 101);

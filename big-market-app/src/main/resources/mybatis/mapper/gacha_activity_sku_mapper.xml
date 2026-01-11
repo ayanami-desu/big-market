@@ -19,5 +19,18 @@
         FROM gacha_activity_sku
         where sku=#{sku}
     </select>
+    <update id="updateSkuStock">
+        update gacha_activity_sku
+        set stock_count_surplus = stock_count_surplus - 1,
+            update_time = now()
+        WHERE sku = #{sku}
+          AND stock_count_surplus > 0
+    </update>
+    <update id="clearSkuStock">
+        update gacha_activity_sku
+        set stock_count_surplus = 0,
+            update_time = now()
+        WHERE sku = #{sku}
+    </update>
 
 </mapper>

@@ -167,5 +167,14 @@ public class RedissonService implements IRedisService {
     public boolean setNX(String key) {
         return redissonClient.getBucket(key).setIfAbsent("lock");
     }
+    @Override
+    public boolean setNX(String key, Long expireTime) {
+        return redissonClient.getBucket(key).setIfAbsent("lock",Duration.ofMillis(expireTime));
+    }
+
+    @Override
+    public void clearBiz(String pattern) {
+        redissonClient.getKeys().deleteByPattern(pattern);
+    }
 }
 

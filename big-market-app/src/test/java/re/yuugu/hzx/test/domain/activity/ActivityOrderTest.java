@@ -8,7 +8,7 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import re.yuugu.hzx.domain.acitivity.model.entity.ActivityChargeEntity;
-import re.yuugu.hzx.domain.acitivity.service.IGachaOrder;
+import re.yuugu.hzx.domain.acitivity.service.quota.IGachaActivityQuotaOrder;
 import re.yuugu.hzx.domain.acitivity.service.armory.IGachaActivityArmory;
 import re.yuugu.hzx.types.exception.AppException;
 
@@ -25,7 +25,7 @@ import java.util.concurrent.CountDownLatch;
 @SpringBootTest
 public class ActivityOrderTest {
     @Resource
-    private IGachaOrder gachaOrder;
+    private IGachaActivityQuotaOrder gachaOrder;
     @Resource
     private IGachaActivityArmory  gachaActivityArmory;
 

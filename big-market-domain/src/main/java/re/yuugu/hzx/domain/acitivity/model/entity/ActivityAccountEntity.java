@@ -16,12 +16,12 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ActivityAccountEntity {
     /**
-     * 用户ID
+     * 用户 ID
      */
     private String userId;
 
     /**
-     * 活动ID
+     * 活动 ID
      */
     private Long activityId;
 

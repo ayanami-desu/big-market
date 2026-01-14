@@ -1,10 +1,10 @@
-package re.yuugu.hzx.domain.acitivity.service.rule.chain.factory;
+package re.yuugu.hzx.domain.acitivity.service.quota.chain.factory;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import re.yuugu.hzx.domain.acitivity.service.rule.chain.IActionChain;
+import re.yuugu.hzx.domain.acitivity.service.quota.chain.IActionChain;
 
 import java.util.Map;
 

@@ -1,4 +1,4 @@
-package re.yuugu.hzx.domain.acitivity.service;
+package re.yuugu.hzx.domain.acitivity.service.quota;
 
 import re.yuugu.hzx.domain.acitivity.model.vo.SkuStockKeyVO;
 
@@ -7,7 +7,7 @@ import re.yuugu.hzx.domain.acitivity.model.vo.SkuStockKeyVO;
  * @ description IGachaStock
  * @ create 2026/1/9 16:19
  */
-public interface ISkuStock {
+public interface IActivityQuotaSkuStock {
     SkuStockKeyVO takeQueueValue();
 
     void clearQueueValue();

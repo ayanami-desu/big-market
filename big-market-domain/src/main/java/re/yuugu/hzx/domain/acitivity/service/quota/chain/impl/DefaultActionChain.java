@@ -1,11 +1,11 @@
-package re.yuugu.hzx.domain.acitivity.service.rule.chain.impl;
+package re.yuugu.hzx.domain.acitivity.service.quota.chain.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import re.yuugu.hzx.domain.acitivity.model.entity.ActivityCountEntity;
 import re.yuugu.hzx.domain.acitivity.model.entity.ActivityEntity;
 import re.yuugu.hzx.domain.acitivity.model.entity.ActivitySkuEntity;
-import re.yuugu.hzx.domain.acitivity.service.rule.chain.AbstractActionChain;
+import re.yuugu.hzx.domain.acitivity.service.quota.chain.AbstractActionChain;
 
 /**
  * @ author anon

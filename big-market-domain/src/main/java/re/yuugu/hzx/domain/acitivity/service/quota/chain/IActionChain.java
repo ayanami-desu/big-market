@@ -1,4 +1,4 @@
-package re.yuugu.hzx.domain.acitivity.service.rule.chain;
+package re.yuugu.hzx.domain.acitivity.service.quota.chain;
 
 import re.yuugu.hzx.domain.acitivity.model.entity.ActivityCountEntity;
 import re.yuugu.hzx.domain.acitivity.model.entity.ActivityEntity;

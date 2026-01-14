@@ -1,12 +1,12 @@
 package re.yuugu.hzx.domain.acitivity.repository;
 
-import re.yuugu.hzx.domain.acitivity.model.aggregate.CreateOrderAggregate;
-import re.yuugu.hzx.domain.acitivity.model.entity.ActivityCountEntity;
-import re.yuugu.hzx.domain.acitivity.model.entity.ActivityEntity;
-import re.yuugu.hzx.domain.acitivity.model.entity.ActivitySkuEntity;
+import re.yuugu.hzx.domain.acitivity.model.aggregate.CreateGachaOrderAggregate;
+import re.yuugu.hzx.domain.acitivity.model.aggregate.CreateSkuOrderAggregate;
+import re.yuugu.hzx.domain.acitivity.model.entity.*;
 import re.yuugu.hzx.domain.acitivity.model.vo.SkuStockKeyVO;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @ author anon
@@ -21,7 +21,7 @@ public interface IActivityRepository {
 
     ActivityCountEntity queryActivityCountByActivityCountId(Long activityCountId);
 
-    void saveOrder(CreateOrderAggregate createOrderAggregate);
+    void saveOrder(CreateSkuOrderAggregate createSkuOrderAggregate);
 
     boolean subtractActivitySkuStock(Long sku, Date endDateTime);
 
@@ -41,4 +41,14 @@ public interface IActivityRepository {
      * redis中库存已经为0，清空数据库中库存
      */
     void clearSkuStock(Long sku);
+
+    void doSaveCreateGachaOrderAggregate(CreateGachaOrderAggregate createGachaOrderAggregate);
+
+    ActivityAccountEntity queryActivityAccountById(String userId, Long activityId);
+
+    ActivityAccountDayEntity queryActivityAccountDayById(String userId, Long activityId, String day);
+
+    ActivityAccountMonthEntity queryActivityAccountMonthById(String userId, Long activityId, String month);
+
+    List<UserGachaOrderEntity> queryNoUsedGachaOrder(String userId, Long activityId);
 }

@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
-import re.yuugu.hzx.domain.acitivity.service.ISkuStock;
+import re.yuugu.hzx.domain.acitivity.service.quota.IActivityQuotaSkuStock;
 import re.yuugu.hzx.types.event.BaseEvent;
 
 import javax.annotation.Resource;
@@ -20,7 +20,7 @@ import javax.annotation.Resource;
 @Component
 public class ActivitySkuStockEnLis {
     @Resource
-    private ISkuStock skuStock;
+    private IActivityQuotaSkuStock skuStock;
 
     @RabbitListener(queuesToDeclare = @Queue(value = "activity_sku_stock_zero"))
     public void listen(String msg) {

@@ -17,6 +17,9 @@ public enum ResponseCode {
     ACTIVITY_DATE_ERR("ERR_BIZ_003","未到活动时间或已超过活动时间"),
     ACTIVITY_STATE_ERR("ERR_BIZ_004","活动状态异常"),
     ACTIVITY_STOCK_ERR("ERR_BIZ_005","活动 sku 库存异常"),
+    ACTIVITY_PARTAKE_STOCK_ERR("ERR_BIZ_005","抽奖账户总库存不足"),
+    ACTIVITY_PARTAKE_STOCK_DAY_ERR("ERR_BIZ_006","抽奖账户日库存不足"),
+    ACTIVITY_PARTAKE_STOCK_MONTH_ERR("ERR_BIZ_007","抽奖账户月总库存不足"),
     DUPLICATE_KEY_EXCEPTION("DuplicateKeyException","键值重复"),
     ;
 

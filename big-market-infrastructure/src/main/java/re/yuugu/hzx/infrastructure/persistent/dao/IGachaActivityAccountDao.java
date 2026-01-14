@@ -1,5 +1,6 @@
 package re.yuugu.hzx.infrastructure.persistent.dao;
 
+import cn.bugstack.middleware.db.router.annotation.DBRouter;
 import org.apache.ibatis.annotations.Mapper;
 import re.yuugu.hzx.infrastructure.persistent.po.GachaActivityAccount;
 
@@ -10,8 +11,14 @@ import re.yuugu.hzx.infrastructure.persistent.po.GachaActivityAccount;
  */
 @Mapper
 public interface IGachaActivityAccountDao {
-    //TODO 为什么这里不用设置分库分表注解？
-    int updateAccountQuota(GachaActivityAccount gachaActivityAccount);
+    @DBRouter(key = "userId")
+    GachaActivityAccount queryActivityAccountById(GachaActivityAccount activityAccount);
+
+    //@DbRouter 非事务中时使用，默认使用userId作为路由键
+    int updateAccountQuota(GachaActivityAccount activityAccount);
 
     void insert(GachaActivityAccount gachaActivityAccount);
+
+
+    int updateAccountQuotaSubtraction(GachaActivityAccount build);
 }

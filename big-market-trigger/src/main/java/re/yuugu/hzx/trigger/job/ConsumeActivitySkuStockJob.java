@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import re.yuugu.hzx.domain.acitivity.model.vo.SkuStockKeyVO;
-import re.yuugu.hzx.domain.acitivity.service.ISkuStock;
+import re.yuugu.hzx.domain.acitivity.service.quota.IActivityQuotaSkuStock;
 
 import javax.annotation.Resource;
 
@@ -17,7 +17,7 @@ import javax.annotation.Resource;
 @Component
 public class ConsumeActivitySkuStockJob {
     @Resource
-    private ISkuStock skuStock;
+    private IActivityQuotaSkuStock skuStock;
 
     @Scheduled(cron = "*/5 * * * * ?")
     public void exec(){

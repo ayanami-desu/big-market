@@ -6,7 +6,7 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import re.yuugu.hzx.domain.acitivity.model.entity.ActivityChargeEntity;
-import re.yuugu.hzx.domain.acitivity.service.IGachaOrder;
+import re.yuugu.hzx.domain.acitivity.service.quota.IGachaActivityQuotaOrder;
 
 import javax.annotation.Resource;
 
@@ -20,7 +20,7 @@ import javax.annotation.Resource;
 @SpringBootTest
 public class RepoTest {
     @Resource
-    private IGachaOrder gachaOrder;
+    private IGachaActivityQuotaOrder gachaOrder;
 
     @Test
     public void test_repository() {

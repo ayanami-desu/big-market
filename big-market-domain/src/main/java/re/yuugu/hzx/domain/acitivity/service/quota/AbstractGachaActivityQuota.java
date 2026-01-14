@@ -1,12 +1,12 @@
-package re.yuugu.hzx.domain.acitivity.service;
+package re.yuugu.hzx.domain.acitivity.service.quota;
 
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
-import re.yuugu.hzx.domain.acitivity.model.aggregate.CreateOrderAggregate;
+import re.yuugu.hzx.domain.acitivity.model.aggregate.CreateSkuOrderAggregate;
 import re.yuugu.hzx.domain.acitivity.model.entity.*;
 import re.yuugu.hzx.domain.acitivity.repository.IActivityRepository;
-import re.yuugu.hzx.domain.acitivity.service.rule.chain.IActionChain;
-import re.yuugu.hzx.domain.acitivity.service.rule.chain.factory.DefaultActionChainFactory;
+import re.yuugu.hzx.domain.acitivity.service.quota.chain.IActionChain;
+import re.yuugu.hzx.domain.acitivity.service.quota.chain.factory.DefaultActionChainFactory;
 import re.yuugu.hzx.types.enums.ResponseCode;
 import re.yuugu.hzx.types.exception.AppException;
 
@@ -16,11 +16,11 @@ import re.yuugu.hzx.types.exception.AppException;
  * @ create 2026/1/4 19:10
  */
 @Slf4j
-public abstract class AbstractGachaActivity implements IGachaOrder, ISkuStock {
+public abstract class AbstractGachaActivityQuota implements IGachaActivityQuotaOrder, IActivityQuotaSkuStock {
     protected IActivityRepository activityRepository;
     protected DefaultActionChainFactory defaultActionChainFactory;
 
-    public AbstractGachaActivity(IActivityRepository activityRepository,DefaultActionChainFactory defaultActionChainFactory) {
+    public AbstractGachaActivityQuota(IActivityRepository activityRepository, DefaultActionChainFactory defaultActionChainFactory) {
         this.activityRepository = activityRepository;
         this.defaultActionChainFactory = defaultActionChainFactory;
     }
@@ -53,16 +53,16 @@ public abstract class AbstractGachaActivity implements IGachaOrder, ISkuStock {
             return null;
         }
         //3. 构建聚合对象
-        CreateOrderAggregate createOrderAggregate = aggregateOrder(activityChargeEntity,activitySkuEntity,activityEntity,activityCountEntity);
+        CreateSkuOrderAggregate createSkuOrderAggregate = aggregateOrder(activityChargeEntity,activitySkuEntity,activityEntity,activityCountEntity);
 
         //4. 保存订单
-        doSaveOrder(createOrderAggregate);
-        return createOrderAggregate.getActivityOrderEntity().getOrderId();
+        doSaveOrder(createSkuOrderAggregate);
+        return createSkuOrderAggregate.getActivityOrderEntity().getOrderId();
     }
 
-    protected abstract void doSaveOrder(CreateOrderAggregate createOrderAggregate);
+    protected abstract void doSaveOrder(CreateSkuOrderAggregate createSkuOrderAggregate);
 
 
-    protected abstract CreateOrderAggregate aggregateOrder(ActivityChargeEntity activityChargeEntity, ActivitySkuEntity activitySkuEntity, ActivityEntity activityEntity, ActivityCountEntity activityCountEntity);
+    protected abstract CreateSkuOrderAggregate aggregateOrder(ActivityChargeEntity activityChargeEntity, ActivitySkuEntity activitySkuEntity, ActivityEntity activityEntity, ActivityCountEntity activityCountEntity);
 
 }

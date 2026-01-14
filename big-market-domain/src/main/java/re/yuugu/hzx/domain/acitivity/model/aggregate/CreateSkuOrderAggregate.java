@@ -15,6 +15,6 @@ import re.yuugu.hzx.domain.acitivity.model.entity.ActivityOrderEntity;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CreateOrderAggregate {
+public class CreateSkuOrderAggregate {
     private ActivityOrderEntity activityOrderEntity;
 }

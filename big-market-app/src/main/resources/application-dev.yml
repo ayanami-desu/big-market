@@ -27,6 +27,7 @@ spring:
     # 用于消息topic @Value注解
     topic:
       activity_sku_stock_zero: activity_sku_stock_zero
+      send_award_message: send_award_message
 
 # 线程池配置
 thread:

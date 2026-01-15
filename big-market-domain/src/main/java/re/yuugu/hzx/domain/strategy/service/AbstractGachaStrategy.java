@@ -11,7 +11,7 @@ import re.yuugu.hzx.types.enums.ResponseCode;
 import re.yuugu.hzx.types.exception.AppException;
 
 @Slf4j
-public abstract class AbstractGachaStrategy implements IGachaStrategy {
+public abstract class AbstractGachaStrategy implements IGachaStrategy, IGachaAwardStock {
     protected IStrategyRepository strategyRepository;
     protected DefaultLogicChainFactory defaultLogicChainFactory;
     protected DefaultRuleTreeFactory defaultRuleTreeFactory;

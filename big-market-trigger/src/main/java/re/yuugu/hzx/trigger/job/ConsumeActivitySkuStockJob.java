@@ -22,7 +22,7 @@ public class ConsumeActivitySkuStockJob {
     @Scheduled(cron = "*/5 * * * * ?")
     public void exec(){
         try {
-            log.info("定时任务，消耗sku库存【延迟队列获取，降低对数据库的更新频次，不要产生竞争】");
+            //log.info("定时任务，消耗sku库存【延迟队列获取，降低对数据库的更新频次，不要产生竞争】");
             SkuStockKeyVO skuStockKeyVO = skuStock.takeQueueValue();
             if (null == skuStockKeyVO) return;
             skuStock.updateSkuStock(skuStockKeyVO.getSku());

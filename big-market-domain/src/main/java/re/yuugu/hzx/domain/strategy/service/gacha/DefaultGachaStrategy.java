@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import re.yuugu.hzx.domain.strategy.model.entity.StrategyAwardEntity;
 import re.yuugu.hzx.domain.strategy.model.vo.RuleTreeVO;
 import re.yuugu.hzx.domain.strategy.model.vo.StrategyAwardRuleModelVO;
+import re.yuugu.hzx.domain.strategy.model.vo.StrategyAwardStockKeyVO;
 import re.yuugu.hzx.domain.strategy.repository.IStrategyRepository;
 import re.yuugu.hzx.domain.strategy.service.AbstractGachaStrategy;
 import re.yuugu.hzx.domain.strategy.service.IGachaAward;
@@ -56,5 +57,15 @@ public class DefaultGachaStrategy extends AbstractGachaStrategy implements IGach
     @Override
     public List<StrategyAwardEntity> queryStrategyAwardList(Long strategyId) {
         return strategyRepository.queryStrategyAwardList(strategyId);
+    }
+
+    @Override
+    public StrategyAwardStockKeyVO offerStrategyAwardQueueValue() {
+        return strategyRepository.offerStrategyAwardQueueValue();
+    }
+
+    @Override
+    public void updateStrategyAwardStock(Long strategyId, Integer awardId) {
+        strategyRepository.updateStrategyAwardStock(strategyId,awardId);
     }
 }

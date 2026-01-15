@@ -22,7 +22,6 @@ public enum ResponseCode {
     ACTIVITY_PARTAKE_STOCK_MONTH_ERR("ERR_BIZ_007","抽奖账户月总库存不足"),
     DUPLICATE_KEY_EXCEPTION("DuplicateKeyException","键值重复"),
     ;
-
     private String code;
     private String info;
 

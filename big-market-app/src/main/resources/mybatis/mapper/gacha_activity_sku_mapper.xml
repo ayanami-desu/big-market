@@ -19,6 +19,11 @@
         FROM gacha_activity_sku
         where sku=#{sku}
     </select>
+    <select id="queryActivitySkuListByActivityId" resultMap="dataMap">
+        SELECT sku,activity_id,activity_count_id,stock_count,stock_count_surplus
+        FROM gacha_activity_sku
+        where activity_id=#{activityId}
+    </select>
     <update id="updateSkuStock">
         update gacha_activity_sku
         set stock_count_surplus = stock_count_surplus - 1,

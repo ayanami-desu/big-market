@@ -44,9 +44,14 @@ public abstract class AbstractGachaStrategy implements IGachaStrategy, IGachaAwa
         return GachaAwardEntity.builder()
                 .awardId(treeAwardVO.getAwardId())
                 .awardConfig(treeAwardVO.getAwardConfig())
+                // todo 查询数据库
                 .awardDesc("最终奖品")
+                .awardTitle("sss")
                 .build();
 
+    }
+    private GachaAwardEntity buildAward(Integer awardId){
+        return null;
     }
     protected abstract DefaultLogicChainFactory.ChainAwardVO processLogicChain(Long strategyId,String userId);
     protected abstract DefaultRuleTreeFactory.TreeAwardVO processLogicTree(Long strategyId,String userId,Integer awardId);

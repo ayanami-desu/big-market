@@ -51,4 +51,6 @@ public interface IActivityRepository {
     ActivityAccountMonthEntity queryActivityAccountMonthById(String userId, Long activityId, String month);
 
     List<UserGachaOrderEntity> queryNoUsedGachaOrder(String userId, Long activityId);
+
+    List<ActivitySkuEntity> queryActivitySkuListByActivityId(Long activityId);
 }

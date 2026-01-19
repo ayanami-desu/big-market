@@ -13,8 +13,10 @@ import re.yuugu.hzx.domain.award.repository.IAwardRepository;
 import re.yuugu.hzx.infrastructure.event.EventPublisher;
 import re.yuugu.hzx.infrastructure.persistent.dao.ITaskDao;
 import re.yuugu.hzx.infrastructure.persistent.dao.IUserAwardRecordDao;
+import re.yuugu.hzx.infrastructure.persistent.dao.IUserGachaOrderDao;
 import re.yuugu.hzx.infrastructure.persistent.po.Task;
 import re.yuugu.hzx.infrastructure.persistent.po.UserAwardRecord;
+import re.yuugu.hzx.infrastructure.persistent.po.UserGachaOrder;
 import re.yuugu.hzx.types.enums.ResponseCode;
 import re.yuugu.hzx.types.exception.AppException;
 
@@ -32,6 +34,8 @@ public class AwardRepository implements IAwardRepository {
     private IUserAwardRecordDao userAwardRecordDao;
     @Resource
     private ITaskDao taskDao;
+    @Resource
+    private IUserGachaOrderDao userGachaOrderDao;
 
     @Resource
     private TransactionTemplate transactionTemplate;
@@ -61,17 +65,26 @@ public class AwardRepository implements IAwardRepository {
                 .messageId(taskEntity.getMessageId())
                 .state(taskEntity.getState().getCode())
                 .build();
+        UserGachaOrder userGachaOrderReq = new UserGachaOrder();
+        userGachaOrderReq.setUserId(userAwardRecordEntity.getUserId());
+        userGachaOrderReq.setOrderId(userAwardRecordEntity.getOrderId());
         try {
             dbRouter.doRouter(userAwardRecordEntity.getUserId());
             transactionTemplate.execute(status -> {
                 try {
                     userAwardRecordDao.insert(userAwardRecord);
                     taskDao.insert(task);
+                    //更新订单状态
+                    int count = userGachaOrderDao.updateOrderStateToUsed(userGachaOrderReq);
+                    if (count != 1) {
+                        status.setRollbackOnly();
+                        throw new AppException(ResponseCode.ACTIVITY_USED_GACHA_ORDER_ERR.getCode(), ResponseCode.ACTIVITY_USED_GACHA_ORDER_ERR.getInfo());
+                    }
                     return 1;
                 } catch (DuplicateKeyException e) {
                     status.setRollbackOnly();
                     log.error("写入中奖记录，唯一索引冲突", e);
-                    throw new AppException(ResponseCode.DUPLICATE_KEY_EXCEPTION.getCode(), e);
+                    throw new AppException(ResponseCode.DUPLICATE_KEY_EXCEPTION.getCode(), ResponseCode.DUPLICATE_KEY_EXCEPTION.getInfo());
                 }
             });
 

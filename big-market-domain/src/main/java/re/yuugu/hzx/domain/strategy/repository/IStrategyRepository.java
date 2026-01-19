@@ -41,4 +41,8 @@ public interface IStrategyRepository {
     StrategyAwardStockKeyVO offerStrategyAwardQueueValue();
 
     void updateStrategyAwardStock(Long strategyId, Integer awardId);
+
+    Long queryStrategyIdByActivityId(Long activityId);
+
+    Long queryUserGachaCount(String userId, Long strategyId);
 }

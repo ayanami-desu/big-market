@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import re.yuugu.hzx.domain.strategy.repository.IStrategyRepository;
 import re.yuugu.hzx.domain.strategy.service.armory.IStrategyArmory;
+import re.yuugu.hzx.domain.strategy.service.dispatch.IGachaStrategyAwardDispatch;
 import re.yuugu.hzx.domain.strategy.service.rule.chain.AbstractLoginChain;
 import re.yuugu.hzx.domain.strategy.service.rule.chain.factory.DefaultLogicChainFactory;
 import re.yuugu.hzx.types.common.Constants;
@@ -20,6 +21,8 @@ public class RuleWeightLogicChain extends AbstractLoginChain {
 
     @Resource
     private IStrategyArmory strategyArmory;
+    @Resource
+    private IGachaStrategyAwardDispatch strategyAwardDispatch;
 
     public Long userPoint=0L;
 
@@ -38,7 +41,7 @@ public class RuleWeightLogicChain extends AbstractLoginChain {
         }
         log.info("责任链-权重范围:接管, weight_key:{}",matched);
         return DefaultLogicChainFactory.ChainAwardVO.builder()
-                .awardId(strategyArmory.getRandomAwardId(String.valueOf(strategyId),map.get(matched)))
+                .awardId(strategyAwardDispatch.getRandomAwardId(String.valueOf(strategyId),map.get(matched)))
                 .logicChainType(DefaultLogicChainFactory.LogicChainType.RULE_WEIGHT)
                 .build();
     }

@@ -6,9 +6,9 @@ import java.util.List;
 
 /**
  * @ author anon
- * @ description IGachaAward
+ * @ description 策略中的奖品
  * @ create 2026/1/1 15:24
  */
-public interface IGachaAward {
+public interface IGachaStrategyAward {
     List<StrategyAwardEntity> queryStrategyAwardList(Long strategyId);
 }

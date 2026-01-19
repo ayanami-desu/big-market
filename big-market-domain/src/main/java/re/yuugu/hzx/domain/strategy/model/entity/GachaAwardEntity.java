@@ -16,4 +16,5 @@ public class GachaAwardEntity {
     private String awardKey;
     private String awardConfig;
     private String awardDesc;
+    private String awardTitle;
 }

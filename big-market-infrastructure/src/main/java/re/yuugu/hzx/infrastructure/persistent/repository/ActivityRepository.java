@@ -24,6 +24,7 @@ import re.yuugu.hzx.types.exception.AppException;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -412,5 +413,26 @@ public class ActivityRepository implements IActivityRepository {
             );
         }
         return userGachaOrderEntities;
+    }
+
+    @Override
+    public List<ActivitySkuEntity> queryActivitySkuListByActivityId(Long activityId) {
+        List<ActivitySkuEntity> activitySkuEntities = new ArrayList<>();
+        List<GachaActivitySku> gachaActivitySkus =activitySkuDao.queryActivitySkuListByActivityId(activityId);
+        if(gachaActivitySkus==null||gachaActivitySkus.isEmpty()){
+            log.error("未配置活动 id 对应的 sku:{}",activityId);
+            throw new AppException(ResponseCode.ILLEGAL_PARAMETER.getCode(),ResponseCode.ILLEGAL_PARAMETER.getInfo());
+        }
+        for(GachaActivitySku gachaActivitySku : gachaActivitySkus){
+            ActivitySkuEntity activitySkuEntity = ActivitySkuEntity.builder()
+                        .sku(gachaActivitySku.getSku())
+                        .activityId(gachaActivitySku.getActivityId())
+                        .activityCountId(gachaActivitySku.getActivityCountId())
+                        .stockCount(gachaActivitySku.getStockCount())
+                        .stockCountSurplus(gachaActivitySku.getStockCountSurplus())
+                        .build();
+            activitySkuEntities.add(activitySkuEntity);
+        }
+        return activitySkuEntities;
     }
 }

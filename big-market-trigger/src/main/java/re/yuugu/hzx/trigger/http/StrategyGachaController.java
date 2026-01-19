@@ -2,7 +2,7 @@ package re.yuugu.hzx.trigger.http;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import re.yuugu.hzx.api.IGachaService;
+import re.yuugu.hzx.api.IGachaStrategyService;
 import re.yuugu.hzx.api.dto.request.RandomGachaReq;
 import re.yuugu.hzx.api.dto.request.StrategyAwardReq;
 import re.yuugu.hzx.api.dto.response.RandomGachaAwardRes;
@@ -10,7 +10,7 @@ import re.yuugu.hzx.api.dto.response.StrategyAwardRes;
 import re.yuugu.hzx.domain.strategy.model.entity.GachaAwardEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.GachaFactorEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.StrategyAwardEntity;
-import re.yuugu.hzx.domain.strategy.service.IGachaAward;
+import re.yuugu.hzx.domain.strategy.service.IGachaStrategyAward;
 import re.yuugu.hzx.domain.strategy.service.IGachaStrategy;
 import re.yuugu.hzx.domain.strategy.service.armory.IStrategyArmory;
 import re.yuugu.hzx.types.enums.ResponseCode;
@@ -28,13 +28,13 @@ import java.util.List;
 @RestController()
 @Slf4j
 @CrossOrigin("${app.config.cross-origin}")
-@RequestMapping("/api/${app.config.api-version}/gacha/")
-public class StrategyGachaController implements IGachaService {
+@RequestMapping("/api/${app.config.api-version}/gacha/strategy")
+public class StrategyGachaController implements IGachaStrategyService {
     @Resource
     private IStrategyArmory strategyArmory;
 
     @Resource
-    private IGachaAward gachaAward;
+    private IGachaStrategyAward gachaStrategyAward;
     @Resource
     private IGachaStrategy gachaStrategy;
 
@@ -68,7 +68,7 @@ public class StrategyGachaController implements IGachaService {
     @RequestMapping(value = "query_strategy_award_list", method = RequestMethod.POST)
     public Response<List<StrategyAwardRes>> queryStrategyAwardList(@RequestBody StrategyAwardReq strategyAwardReq) {
         try {
-            List<StrategyAwardEntity> strategyAwardEntities = gachaAward.queryStrategyAwardList(strategyAwardReq.getStrategyId());
+            List<StrategyAwardEntity> strategyAwardEntities = gachaStrategyAward.queryStrategyAwardList(strategyAwardReq.getStrategyId());
             List<StrategyAwardRes> strategyAwardRes = new ArrayList<>();
             for (StrategyAwardEntity strategyAwardEntity : strategyAwardEntities) {
                 strategyAwardRes.add(StrategyAwardRes.builder()

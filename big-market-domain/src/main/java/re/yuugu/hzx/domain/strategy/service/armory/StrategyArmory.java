@@ -1,12 +1,10 @@
 package re.yuugu.hzx.domain.strategy.service.armory;
 
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.springframework.stereotype.Service;
 import re.yuugu.hzx.domain.strategy.model.entity.StrategyAwardEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.StrategyEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.StrategyRuleEntity;
-import re.yuugu.hzx.domain.strategy.po.AliasTable;
 import re.yuugu.hzx.domain.strategy.repository.IStrategyRepository;
 import re.yuugu.hzx.types.enums.ResponseCode;
 import re.yuugu.hzx.types.exception.AppException;
@@ -14,34 +12,37 @@ import re.yuugu.hzx.types.exception.AppException;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.security.SecureRandom;
 import java.util.*;
 
 
 @Slf4j
 @Service
 public class StrategyArmory implements IStrategyArmory {
-    private static final ThreadLocal<SecureRandom> TLS_SR =
-            ThreadLocal.withInitial(SecureRandom::new);
     @Resource
-    private IStrategyRepository repository;
+    private IStrategyRepository strategyRepository;
+
+    @Override
+    public boolean assembleStrategyByActivityId(Long activityId) {
+        long strategyId = strategyRepository.queryStrategyIdByActivityId(activityId);
+        return assembleLotteryStrategy(strategyId);
+    }
 
     @Override
     public boolean assembleLotteryStrategy(Long strategyId) {
         // 1. 查询策略配置，即某个抽奖策略中有哪些奖品，其概率、数量、排序等信息
-        List<StrategyAwardEntity> strategyAwardEntities = repository.queryStrategyAwardList(strategyId);
+        List<StrategyAwardEntity> strategyAwardEntities = strategyRepository.queryStrategyAwardList(strategyId);
         //2. 缓存奖品剩余数量
         for(StrategyAwardEntity strategyAwardEntity : strategyAwardEntities){
-            repository.cacheStrategyAwardSurplusCount(strategyId,strategyAwardEntity.getAwardId(),strategyAwardEntity.getAwardCountSurplus());
+            strategyRepository.cacheStrategyAwardSurplusCount(strategyId,strategyAwardEntity.getAwardId(),strategyAwardEntity.getAwardCountSurplus());
         }
 
         assembleOneStrategy(String.valueOf(strategyId), strategyAwardEntities);
 
-        StrategyEntity strategyEntity = repository.queryStrategyEntityByStrategyId(strategyId);
+        StrategyEntity strategyEntity = strategyRepository.queryStrategyEntityByStrategyId(strategyId);
         if (strategyEntity == null) return false;
         String ruleWeight = strategyEntity.getRuleWeight();
         if (ruleWeight == null) return false;
-        StrategyRuleEntity strategyRuleEntity = repository.queryStrategyRuleEntity(strategyId, ruleWeight);
+        StrategyRuleEntity strategyRuleEntity = strategyRepository.queryStrategyRuleEntity(strategyId, ruleWeight);
         if (strategyRuleEntity == null) {
             throw new AppException(ResponseCode.STRATEGY_RULE_WEIGHT_IS_NULL.getCode(), ResponseCode.STRATEGY_RULE_WEIGHT_IS_NULL.getInfo());
         }
@@ -108,28 +109,6 @@ public class StrategyArmory implements IStrategyArmory {
             alias[l] = l;
         }
 
-        repository.storeStrategyAwardRateSearchTable(key, awardIds, probe, alias);
-    }
-
-    @Override
-    public Integer getRandomAwardId(String key) {
-        AliasTable table = repository.getStrategyAwardRateSearchTable(key);
-        return getInteger(table);
-    }
-
-    @NonNull
-    private Integer getInteger(AliasTable table) {
-        if (table == null) throw new IllegalStateException("alias table missing");
-        SecureRandom sr = TLS_SR.get();
-        int column = sr.nextInt(table.getN());
-        double u = sr.nextDouble();
-        int idx = (u < table.getProbe()[column]) ? column : table.getAlias()[column];
-        return table.getAwardIds()[idx];
-    }
-
-    @Override
-    public Integer getRandomAwardId(String key, String ruleWeight) {
-        AliasTable table = repository.getStrategyAwardRateSearchTable(key + "_" + ruleWeight);
-        return getInteger(table);
+        strategyRepository.storeStrategyAwardRateSearchTable(key, awardIds, probe, alias);
     }
 }

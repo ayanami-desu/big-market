@@ -11,4 +11,8 @@ import re.yuugu.hzx.infrastructure.persistent.po.GachaActivity;
 @Mapper
 public interface IGachaActivityDao {
     GachaActivity queryActivityById(Long activityId);
+
+    Long queryStrategyIdByActivityId(Long activityId);
+
+    Long queryActivityIdByStrategyId(Long strategyId);
 }

@@ -3,6 +3,8 @@ package re.yuugu.hzx.infrastructure.persistent.dao;
 import org.apache.ibatis.annotations.Mapper;
 import re.yuugu.hzx.infrastructure.persistent.po.GachaActivitySku;
 
+import java.util.List;
+
 /**
  * @ author anon
  * @ description IGachaActivitySku
@@ -15,4 +17,6 @@ public interface IGachaActivitySkuDao {
     void updateSkuStock(Long sku);
 
     void clearSkuStock(Long sku);
+
+    List<GachaActivitySku> queryActivitySkuListByActivityId(Long activityId);
 }

@@ -13,14 +13,23 @@
         <result column="state" property="state"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
-
-
     </resultMap>
 
     <select id="queryActivityById" resultMap="dataMap">
-        SELECT activity_id,activity_name,activity_desc,begin_date_time,end_date_time,strategy_id,state
+        SELECT activity_id, activity_name, activity_desc, begin_date_time, end_date_time, strategy_id, state
         FROM gacha_activity
-        where activity_id=#{activityId}
+        where activity_id = #{activityId}
+    </select>
+
+    <select id="queryStrategyIdByActivityId" resultType="java.lang.Long">
+        SELECT strategy_id
+        FROM gacha_activity
+        where activity_id = #{activityId}
+    </select>
+    <select id="queryActivityIdByStrategyId" resultType="java.lang.Long">
+        SELECT activity_id
+        FROM gacha_activity
+        where strategy_id = #{strategyId}
     </select>
 
 </mapper>

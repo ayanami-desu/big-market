@@ -30,20 +30,20 @@ import java.util.stream.Collectors;
 public class StrategyRepository implements IStrategyRepository {
     @Resource
     private IStrategyAwardDao strategyAwardDao;
-
     @Resource
     private IStrategyDao strategyDao;
-
     @Resource
     private IStrategyRuleDao strategyRuleDao;
     @Resource
     private IRuleTreeDao ruleTreeDao;
-
     @Resource
     private IRuleTreeNodeDao ruleTreeNodeDao;
-
     @Resource
     private IRuleTreeEdgeDao ruleTreeEdgeDao;
+    @Resource
+    private IGachaActivityDao activityDao;
+    @Resource
+    private IGachaActivityAccountDao activityAccountDao;
 
     @Resource
     private IRedisService redisService;
@@ -58,8 +58,8 @@ public class StrategyRepository implements IStrategyRepository {
         }
         // 从数据库中读取
         List<StrategyAward> strategyAwards = strategyAwardDao.queryStrategyAwardListByStrategyId(strategyId);
-        if(strategyAwards==null || strategyAwards.isEmpty()){
-            log.error("未查询到奖品列表 strategyId:{}",strategyId);
+        if (strategyAwards == null || strategyAwards.isEmpty()) {
+            log.error("未查询到奖品列表 strategyId:{}", strategyId);
             return null;
         }
         strategyAwardEntities = new ArrayList<>();
@@ -90,8 +90,8 @@ public class StrategyRepository implements IStrategyRepository {
     @Override
     public AliasTable getStrategyAwardRateSearchTable(String key) {
         String cacheKey = Constants.RedisKeys.STRATEGY_AWARD_ALIAS_KEY + key;
-        if(!redisService.isExists(cacheKey)){
-            throw new AppException(ResponseCode.STRATEGY_NOT_CONFIGURED.getCode(),ResponseCode.STRATEGY_RULE_WEIGHT_IS_NULL.getInfo());
+        if (!redisService.isExists(cacheKey)) {
+            throw new AppException(ResponseCode.STRATEGY_NOT_CONFIGURED.getCode(), ResponseCode.STRATEGY_RULE_WEIGHT_IS_NULL.getInfo());
         }
         return redisService.getValue(cacheKey);
     }
@@ -229,7 +229,7 @@ public class StrategyRepository implements IStrategyRepository {
     @Override
     public void cacheStrategyAwardSurplusCount(Long strategyId, Integer awardId, Integer awardCountSurplus) {
         String cacheKey = Constants.RedisKeys.STRATEGY_AWARD_SURPLUS_COUNT + strategyId + "_" + awardId;
-        if(redisService.isExists(cacheKey)){
+        if (redisService.isExists(cacheKey)) {
             return;
         }
         redisService.setAtomicLong(cacheKey, awardCountSurplus);
@@ -245,7 +245,7 @@ public class StrategyRepository implements IStrategyRepository {
         }
         //加锁
         //已经上锁代表这个库存数已经被扣减过
-        String lockKey = cacheKey+"_" + surplus;
+        String lockKey = cacheKey + "_" + surplus;
         boolean lock = redisService.setNX(lockKey);
         if (!lock) {
             log.info("出现异常：库存数不一致");
@@ -272,5 +272,26 @@ public class StrategyRepository implements IStrategyRepository {
     @Override
     public void updateStrategyAwardStock(Long strategyId, Integer awardId) {
         strategyAwardDao.updateStrategyAwardStock(strategyId, awardId);
+    }
+
+    @Override
+    public Long queryStrategyIdByActivityId(Long activityId) {
+        return activityDao.queryStrategyIdByActivityId(activityId);
+    }
+
+    @Override
+    public Long queryUserGachaCount(String userId, Long strategyId) {
+        long activityId = activityDao.queryActivityIdByStrategyId(strategyId);
+
+        GachaActivityAccount activityAccountReq = new GachaActivityAccount();
+        activityAccountReq.setActivityId(activityId);
+        activityAccountReq.setUserId(userId);
+
+        GachaActivityAccount gachaActivityAccount = activityAccountDao.queryActivityAccountById(activityAccountReq);
+        if(gachaActivityAccount==null){
+            //即用户还未进行抽奖
+            return 0L;
+        }
+        return (long) (gachaActivityAccount.getTotalCount()-gachaActivityAccount.getTotalCountSurplus());
     }
 }

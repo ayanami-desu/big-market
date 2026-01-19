@@ -19,4 +19,6 @@ public interface IUserGachaOrderDao {
     List<UserGachaOrder> queryNoUsedGachaOrder(UserGachaOrder userGachaOrder);
 
     void insert(UserGachaOrder userGachaOrder);
+
+    int updateOrderStateToUsed(UserGachaOrder userGachaOrderReq);
 }

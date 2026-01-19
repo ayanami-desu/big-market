@@ -13,7 +13,7 @@ import java.util.List;
  * @ description IGachaService
  * @ create 2025/12/31 16:38
  */
-public interface IGachaService {
+public interface IGachaStrategyService {
     Response<Boolean> armoryStrategy(Long strategyId);
     Response<List<StrategyAwardRes>> queryStrategyAwardList(StrategyAwardReq strategyAwardListReq);
     Response<RandomGachaAwardRes>  randomGacha(RandomGachaReq randomGachaReq);

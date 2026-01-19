@@ -31,7 +31,7 @@ public class ActivityOrderTest {
 
     @Before
     public void setUp() {
-        boolean status = gachaActivityArmory.assembleActivity(9011L);
+        boolean status = gachaActivityArmory.assembleActivitySku(9011L);
         log.info("装配活动,{}", status);
     }
     @Test

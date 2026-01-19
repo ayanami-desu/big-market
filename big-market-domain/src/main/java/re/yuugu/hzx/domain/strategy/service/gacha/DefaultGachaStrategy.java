@@ -8,7 +8,7 @@ import re.yuugu.hzx.domain.strategy.model.vo.StrategyAwardRuleModelVO;
 import re.yuugu.hzx.domain.strategy.model.vo.StrategyAwardStockKeyVO;
 import re.yuugu.hzx.domain.strategy.repository.IStrategyRepository;
 import re.yuugu.hzx.domain.strategy.service.AbstractGachaStrategy;
-import re.yuugu.hzx.domain.strategy.service.IGachaAward;
+import re.yuugu.hzx.domain.strategy.service.IGachaStrategyAward;
 import re.yuugu.hzx.domain.strategy.service.rule.chain.ILogicChain;
 import re.yuugu.hzx.domain.strategy.service.rule.chain.factory.DefaultLogicChainFactory;
 import re.yuugu.hzx.domain.strategy.service.rule.tree.engine.DecisionTreeEngine;
@@ -18,7 +18,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class DefaultGachaStrategy extends AbstractGachaStrategy implements IGachaAward {
+public class DefaultGachaStrategy extends AbstractGachaStrategy implements IGachaStrategyAward {
     // 子类直接用父类的字段值
     public DefaultGachaStrategy(IStrategyRepository strategyRepository, DefaultLogicChainFactory defaultLogicChainFactory,DefaultRuleTreeFactory defaultRuleTreeFactory) {
         super(strategyRepository, defaultLogicChainFactory, defaultRuleTreeFactory);

@@ -6,5 +6,6 @@ package re.yuugu.hzx.domain.acitivity.service.armory;
  * @ create 2026/1/9 16:43
  */
 public interface IGachaActivityArmory {
-    boolean assembleActivity(Long sku);
+    boolean assembleActivityByActivityId(Long activityId);
+    boolean assembleActivitySku(Long sku);
 }

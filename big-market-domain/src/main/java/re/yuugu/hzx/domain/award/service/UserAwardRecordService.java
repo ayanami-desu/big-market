@@ -33,9 +33,8 @@ public class UserAwardRecordService implements IUserAwardRecordService {
         //mq 消息
         BaseEvent.EventMessage<SendAwardMessageEvent.SendAwardMessage> msg = sendAwardMessageEvent.buildEventMessage(sendAwardMessage);
 
-
         //任务对象
-        TaskEntity  taskEntity = new TaskEntity();
+        TaskEntity taskEntity = new TaskEntity();
         taskEntity.setUserId(userAwardRecordEntity.getUserId());
         taskEntity.setMessage(msg);
         taskEntity.setMessageId(msg.getId());

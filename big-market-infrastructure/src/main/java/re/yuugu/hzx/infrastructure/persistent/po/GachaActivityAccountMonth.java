@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -33,5 +34,10 @@ public class GachaActivityAccountMonth {
     private Date createTime;
     /** 更新时间 */
     private Date updateTime;
+
+    public String currentMonth(){
+        SimpleDateFormat dateFormatMonth = new SimpleDateFormat("yyyy-MM");
+        return dateFormatMonth.format(new Date());
+    }
 
 }

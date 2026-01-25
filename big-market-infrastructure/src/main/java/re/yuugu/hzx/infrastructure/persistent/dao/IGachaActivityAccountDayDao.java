@@ -17,4 +17,6 @@ public interface IGachaActivityAccountDayDao {
     void insert(GachaActivityAccountDay gachaActivityAccountDay);
 
     int updateAccountDayQuota(GachaActivityAccountDay gachaActivityAccountDay);
+
+    void addAccountQuota(GachaActivityAccountDay gachaActivityAccountDay);
 }

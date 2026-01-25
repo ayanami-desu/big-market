@@ -24,7 +24,6 @@ import re.yuugu.hzx.types.exception.AppException;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -150,6 +149,20 @@ public class ActivityRepository implements IActivityRepository {
             gachaActivityAccount.setMonthCount(activityOrderEntity.getMonthCount());
             gachaActivityAccount.setMonthCountSurplus(activityOrderEntity.getMonthCount());
 
+            GachaActivityAccountMonth gachaActivityAccountMonth = new GachaActivityAccountMonth();
+            gachaActivityAccountMonth.setUserId(activityOrderEntity.getUserId());
+            gachaActivityAccountMonth.setActivityId(activityOrderEntity.getActivityId());
+            gachaActivityAccountMonth.setMonth(gachaActivityAccountMonth.currentMonth());
+            gachaActivityAccountMonth.setMonthCount(activityOrderEntity.getMonthCount());
+            gachaActivityAccountMonth.setMonthCountSurplus(activityOrderEntity.getMonthCount());
+
+            GachaActivityAccountDay gachaActivityAccountDay = new GachaActivityAccountDay();
+            gachaActivityAccountDay.setUserId(activityOrderEntity.getUserId());
+            gachaActivityAccountDay.setActivityId(activityOrderEntity.getActivityId());
+            gachaActivityAccountDay.setDay(gachaActivityAccountDay.currentDay());
+            gachaActivityAccountDay.setDayCount(activityOrderEntity.getDayCount());
+            gachaActivityAccountDay.setDayCountSurplus(activityOrderEntity.getDayCount());
+
             //只要这里设置了路由，后面的方法都会自动根据路由结果进行分库
             //至于分表则需要在 dao 中设置注解
             dbRouter.doRouter(activityOrderEntity.getUserId());
@@ -160,6 +173,10 @@ public class ActivityRepository implements IActivityRepository {
                     if (count == 0) {
                         activityAccountDao.insert(gachaActivityAccount);
                     }
+                    //抽奖时月日度账户不存在会重新创建,这里就不用判断有没有了,有就更新,更新失败就不用管了
+                    //“如果有，就需要更新”
+                    activityAccountDayDao.addAccountQuota(gachaActivityAccountDay);
+                    activityAccountMonthDao.addAccountQuota(gachaActivityAccountMonth);
                     return 1;
                 } catch (DuplicateKeyException e) {
                     status.setRollbackOnly();
@@ -418,19 +435,19 @@ public class ActivityRepository implements IActivityRepository {
     @Override
     public List<ActivitySkuEntity> queryActivitySkuListByActivityId(Long activityId) {
         List<ActivitySkuEntity> activitySkuEntities = new ArrayList<>();
-        List<GachaActivitySku> gachaActivitySkus =activitySkuDao.queryActivitySkuListByActivityId(activityId);
-        if(gachaActivitySkus==null||gachaActivitySkus.isEmpty()){
-            log.error("未配置活动 id 对应的 sku:{}",activityId);
-            throw new AppException(ResponseCode.ILLEGAL_PARAMETER.getCode(),ResponseCode.ILLEGAL_PARAMETER.getInfo());
+        List<GachaActivitySku> gachaActivitySkus = activitySkuDao.queryActivitySkuListByActivityId(activityId);
+        if (gachaActivitySkus == null || gachaActivitySkus.isEmpty()) {
+            log.error("未配置活动 id 对应的 sku:{}", activityId);
+            throw new AppException(ResponseCode.ILLEGAL_PARAMETER.getCode(), ResponseCode.ILLEGAL_PARAMETER.getInfo());
         }
-        for(GachaActivitySku gachaActivitySku : gachaActivitySkus){
+        for (GachaActivitySku gachaActivitySku : gachaActivitySkus) {
             ActivitySkuEntity activitySkuEntity = ActivitySkuEntity.builder()
-                        .sku(gachaActivitySku.getSku())
-                        .activityId(gachaActivitySku.getActivityId())
-                        .activityCountId(gachaActivitySku.getActivityCountId())
-                        .stockCount(gachaActivitySku.getStockCount())
-                        .stockCountSurplus(gachaActivitySku.getStockCountSurplus())
-                        .build();
+                    .sku(gachaActivitySku.getSku())
+                    .activityId(gachaActivitySku.getActivityId())
+                    .activityCountId(gachaActivitySku.getActivityCountId())
+                    .stockCount(gachaActivitySku.getStockCount())
+                    .stockCountSurplus(gachaActivitySku.getStockCountSurplus())
+                    .build();
             activitySkuEntities.add(activitySkuEntity);
         }
         return activitySkuEntities;

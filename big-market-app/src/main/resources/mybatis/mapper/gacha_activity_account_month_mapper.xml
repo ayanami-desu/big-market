@@ -14,18 +14,31 @@
     </resultMap>
     <insert id="insert" parameterType="re.yuugu.hzx.infrastructure.persistent.po.GachaActivityAccountMonth">
         insert into gacha_activity_account_month
-        (user_id,activity_id,month,month_count,month_count_surplus,create_time,update_time)
-        values (#{userId}, #{activityId},#{month}, #{monthCount}, #{monthCountSurplus}, now(), now())
+        (user_id, activity_id, month, month_count, month_count_surplus, create_time, update_time)
+        values (#{userId}, #{activityId}, #{month}, #{monthCount}, #{monthCountSurplus}, now(), now())
     </insert>
-    <update id="updateAccountMonthQuota" parameterType="re.yuugu.hzx.infrastructure.persistent.po.GachaActivityAccountMonth">
+    <update id="updateAccountMonthQuota"
+            parameterType="re.yuugu.hzx.infrastructure.persistent.po.GachaActivityAccountMonth">
         update gacha_activity_account_month
-        set month_count_surplus = month_count_surplus -1,
-            update_time = now()
-        where activity_id=#{activityId} and user_id=#{userId} and month=#{month} and month_count_surplus>0
+        set month_count_surplus = month_count_surplus - 1,
+            update_time         = now()
+        where activity_id = #{activityId} and user_id = #{userId} and month = #{month}
+          and month_count_surplus > 0
     </update>
-    <select id="queryActivityAccountMonthById" parameterType="re.yuugu.hzx.infrastructure.persistent.po.GachaActivityAccountMonth" resultMap="dataMap">
-        select user_id,activity_id,`month`,month_count,month_count_surplus
+    <select id="queryActivityAccountMonthById"
+            parameterType="re.yuugu.hzx.infrastructure.persistent.po.GachaActivityAccountMonth" resultMap="dataMap">
+        select user_id, activity_id, `month`, month_count, month_count_surplus
         from gacha_activity_account_month
-        where activity_id=#{activityId} and user_id=#{userId} and `month`=#{month}
+        where activity_id = #{activityId}
+          and user_id = #{userId}
+          and `month` = #{month}
     </select>
+    <update id="addAccountQuota" parameterType="re.yuugu.hzx.infrastructure.persistent.po.GachaActivityAccountMonth">
+        update gacha_activity_account_month
+        set month_count=month_count + 1,
+            month_count_surplus = month_count_surplus + 1,
+            update_time = now()
+        where activity_id = #{activityId} and user_id = #{userId} and month = #{month}
+          and month_count_surplus > 0
+    </update>
 </mapper>

@@ -11,10 +11,12 @@ import re.yuugu.hzx.infrastructure.persistent.po.GachaActivityAccountMonth;
  */
 @Mapper
 public interface IGachaActivityAccountMonthDao {
-    @DBRouter(key="userId")
+    @DBRouter(key = "userId")
     GachaActivityAccountMonth queryActivityAccountMonthById(GachaActivityAccountMonth gachaActivityAccountMonth);
 
     int updateAccountMonthQuota(GachaActivityAccountMonth gachaActivityAccountMonth);
 
     void insert(GachaActivityAccountMonth gachaActivityAccountMonth);
+
+    void addAccountQuota(GachaActivityAccountMonth gachaActivityAccountMonth);
 }

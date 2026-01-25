@@ -5,6 +5,7 @@ public class Constants {
     public final static String COMMA = ",";
     public final static String COLON= ":";
     public final static String SEMICOLON = ";";
+    public static final String UNDERLINE = "_";
 
     public static class RedisKeys {
         public static final String STRATEGY_KEY = "big_market_strategy_";
@@ -21,6 +22,8 @@ public class Constants {
         public static final String ACTIVITY_ACTIVITY_COUNT_ID="big_market_activity_activity_count_id_";
         public static final String ACTIVITY_SKU_SURPLUS_COUNT = "big_market_activity_sku_surplus_count_";
         public static final String ACTIVITY_SKU_STOCK_QUEUE = "big_market_activity_sku_stock_queue_";
+
+        public static final String REBATE_BEHAVIOR_CONFIG_KEY = "big_market_behavior_config_";
     }
 
 }

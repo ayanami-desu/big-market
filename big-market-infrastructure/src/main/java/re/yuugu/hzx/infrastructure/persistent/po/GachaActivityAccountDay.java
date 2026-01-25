@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -33,5 +34,8 @@ public class GachaActivityAccountDay {
     private Date createTime;
     /** 更新时间 */
     private Date updateTime;
-
+    public String currentDay(){
+        SimpleDateFormat dateFormatDay = new SimpleDateFormat("yyyy-MM-dd");
+        return dateFormatDay.format(new Date());
+    }
 }

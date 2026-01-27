@@ -84,15 +84,16 @@ public class BehaviorRebateRepository implements IBehaviorRebateRepository {
         RebateOrderEntity rebateOrderEntity = createRebateOrderAggregate.getRebateOrderEntity();
         TaskEntity taskEntity = createRebateOrderAggregate.getTaskEntity();
 
-        UserBehaviorRebateOrder userBehaviorRebateOrder = new UserBehaviorRebateOrder();
-        userBehaviorRebateOrder.setUserId(rebateOrderEntity.getUserId());
-        userBehaviorRebateOrder.setOrderId(rebateOrderEntity.getOrderId());
-        userBehaviorRebateOrder.setBehaviorType(rebateOrderEntity.getBehaviorType().getCode());
-        userBehaviorRebateOrder.setRebateDesc(rebateOrderEntity.getRebateDesc());
-        userBehaviorRebateOrder.setRebateType(rebateOrderEntity.getRebateType().getCode());
-        userBehaviorRebateOrder.setRebateConfig(rebateOrderEntity.getRebateConfig());
-        userBehaviorRebateOrder.setBizId(rebateOrderEntity.getBizId());
-
+        UserBehaviorRebateOrder userBehaviorRebateOrder = UserBehaviorRebateOrder.builder()
+                .userId(rebateOrderEntity.getUserId())
+                .orderId(rebateOrderEntity.getOrderId())
+                .behaviorType(rebateOrderEntity.getBehaviorType().getCode())
+                .rebateDesc(rebateOrderEntity.getRebateDesc())
+                .rebateType(rebateOrderEntity.getRebateType().getCode())
+                .rebateConfig(rebateOrderEntity.getRebateConfig())
+                .bizId(rebateOrderEntity.getBizId())
+                .outBusinessNo(rebateOrderEntity.getOutBusinessNo())
+                .build();
         Task task = Task.builder()
                 .userId(taskEntity.getUserId())
                 .topic(taskEntity.getTopic())
@@ -124,5 +125,31 @@ public class BehaviorRebateRepository implements IBehaviorRebateRepository {
             log.error("写入行为返利订单，发送mq消息失败");
             taskDao.updateStateToFail(task);
         }
+    }
+
+    @Override
+    public List<RebateOrderEntity> queryOrderByOutBusinessNo(String userId, String outBusinessNo) {
+        UserBehaviorRebateOrder userBehaviorRebateOrderReq = new UserBehaviorRebateOrder();
+        userBehaviorRebateOrderReq.setUserId(userId);
+        userBehaviorRebateOrderReq.setOutBusinessNo(outBusinessNo);
+        List<UserBehaviorRebateOrder> userBehaviorRebateOrderList = userBehaviorRebateOrderDao.queryOrderByOutBusinessNo(userBehaviorRebateOrderReq);
+        if (userBehaviorRebateOrderList == null || userBehaviorRebateOrderList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<RebateOrderEntity> result = new ArrayList<>();
+        for (UserBehaviorRebateOrder userBehaviorRebateOrder : userBehaviorRebateOrderList) {
+            RebateOrderEntity rebateOrderEntity = RebateOrderEntity.builder()
+                    .userId(userBehaviorRebateOrder.getUserId())
+                    .orderId(userBehaviorRebateOrder.getOrderId())
+                    .behaviorType(BehaviorTypeVO.valueOf(userBehaviorRebateOrder.getBehaviorType()))
+                    .rebateDesc(userBehaviorRebateOrder.getRebateDesc())
+                    .rebateType(RebateTypeVO.valueOf(userBehaviorRebateOrder.getRebateType()))
+                    .rebateConfig(userBehaviorRebateOrder.getRebateConfig())
+                    .bizId(userBehaviorRebateOrder.getBizId())
+                    .outBusinessNo(userBehaviorRebateOrder.getOutBusinessNo())
+                    .build();
+            result.add(rebateOrderEntity);
+        }
+        return result;
     }
 }

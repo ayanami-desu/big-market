@@ -1,5 +1,10 @@
 package re.yuugu.hzx.infrastructure.persistent.po;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.Date;
 
 /**
@@ -8,6 +13,9 @@ import java.util.Date;
  * @ create 2026/1/24 15:43
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserBehaviorRebateOrder{
 
     /** 自增 ID */
@@ -47,6 +55,11 @@ public class UserBehaviorRebateOrder{
      * 业务ID - 拼接的唯一值
      */
     private String bizId;
+
+    /**
+     * 外部业务 id
+     */
+    private String outBusinessNo;
 
     /** 创建时间 */
     private Date createTime;

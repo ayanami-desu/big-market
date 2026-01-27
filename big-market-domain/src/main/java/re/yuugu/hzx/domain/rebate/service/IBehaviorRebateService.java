@@ -1,6 +1,7 @@
 package re.yuugu.hzx.domain.rebate.service;
 
 import re.yuugu.hzx.domain.rebate.model.entity.RebateBehaviorEntity;
+import re.yuugu.hzx.domain.rebate.model.entity.RebateOrderEntity;
 
 import java.util.List;
 
@@ -14,4 +15,6 @@ public interface IBehaviorRebateService {
      * @return 创建的订单号，一种返利行为可能对应多种返利结果
      */
     List<String> saveRebateOrder(RebateBehaviorEntity rebateBehaviorEntity);
+
+    List<RebateOrderEntity> queryOrderByOutBusinessNo(String userId, String outBusinessNo);
 }

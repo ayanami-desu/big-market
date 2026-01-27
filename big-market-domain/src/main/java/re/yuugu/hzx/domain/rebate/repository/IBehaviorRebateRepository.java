@@ -1,6 +1,7 @@
 package re.yuugu.hzx.domain.rebate.repository;
 
 import re.yuugu.hzx.domain.rebate.model.aggregate.CreateRebateOrderAggregate;
+import re.yuugu.hzx.domain.rebate.model.entity.RebateOrderEntity;
 import re.yuugu.hzx.domain.rebate.model.vo.BehaviorRebateVO;
 
 import java.util.List;
@@ -14,4 +15,6 @@ public interface IBehaviorRebateRepository {
     List<BehaviorRebateVO> queryBehaviorRebateConfig(String behaviorType);
 
     void doSaveRebateOrderAggregate(CreateRebateOrderAggregate createRebateOrderAggregate);
+
+    List<RebateOrderEntity> queryOrderByOutBusinessNo(String userId, String outBusinessNo);
 }

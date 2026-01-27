@@ -51,6 +51,7 @@ public class BehaviorRebateService implements IBehaviorRebateService {
                     .rebateType(behaviorRebateVO.getRebateType())
                     .rebateConfig(behaviorRebateVO.getRebateConfig())
                     .bizId(bizId)
+                    .outBusinessNo(rebateBehaviorEntity.getOutBusinessNo())
                     .build();
             // SendRebateMessage 消息对象
             SendRebateMessageEvent.SendRebateMessage msg = new SendRebateMessageEvent.SendRebateMessage();
@@ -80,5 +81,10 @@ public class BehaviorRebateService implements IBehaviorRebateService {
             result.add(rebateOrderEntity.getOrderId());
         }
         return result;
+    }
+
+    @Override
+    public List<RebateOrderEntity> queryOrderByOutBusinessNo(String userId, String outBusinessNo) {
+        return behaviorRebateRepository.queryOrderByOutBusinessNo(userId, outBusinessNo);
     }
 }

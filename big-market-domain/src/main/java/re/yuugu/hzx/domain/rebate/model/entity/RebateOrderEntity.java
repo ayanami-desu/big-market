@@ -51,4 +51,9 @@ public class RebateOrderEntity {
      * 业务ID - 拼接的唯一值
      */
     private String bizId;
+
+    /**
+     * 外部业务 id
+     */
+    private String outBusinessNo;
 }

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import re.yuugu.hzx.api.IGachaActivityService;
+import re.yuugu.hzx.api.dto.request.ActivityDailySignReq;
 import re.yuugu.hzx.api.dto.request.ActivityDrawReq;
 import re.yuugu.hzx.api.dto.response.ActivityDrawRes;
 import re.yuugu.hzx.api.response.Response;
@@ -14,6 +15,10 @@ import re.yuugu.hzx.domain.acitivity.service.partake.IGachaActivityPartake;
 import re.yuugu.hzx.domain.award.model.entity.UserAwardRecordEntity;
 import re.yuugu.hzx.domain.award.model.vo.AwardStateVO;
 import re.yuugu.hzx.domain.award.service.IUserAwardRecordService;
+import re.yuugu.hzx.domain.rebate.model.entity.RebateBehaviorEntity;
+import re.yuugu.hzx.domain.rebate.model.entity.RebateOrderEntity;
+import re.yuugu.hzx.domain.rebate.model.vo.BehaviorTypeVO;
+import re.yuugu.hzx.domain.rebate.service.IBehaviorRebateService;
 import re.yuugu.hzx.domain.strategy.model.entity.GachaAwardEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.GachaFactorEntity;
 import re.yuugu.hzx.domain.strategy.service.IGachaStrategy;
@@ -22,8 +27,9 @@ import re.yuugu.hzx.types.enums.ResponseCode;
 import re.yuugu.hzx.types.exception.AppException;
 
 import javax.annotation.Resource;
-import java.security.Principal;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @ author anon
@@ -45,10 +51,14 @@ public class ActivityGachaController implements IGachaActivityService {
     private IGachaStrategy gachaStrategy;
     @Resource
     private IUserAwardRecordService userAwardRecordService;
+    @Resource
+    private IBehaviorRebateService behaviorRebateService;
+
+    private final SimpleDateFormat dateFormatDay = new SimpleDateFormat("yyyy-MM-dd");
 
     @Override
     @RequestMapping(value = "armory_activity", method = RequestMethod.POST)
-    public Response<Boolean> armoryActivity(@RequestBody Long activityId, Principal principal) {
+    public Response<Boolean> armoryActivity(@RequestBody Long activityId) {
         try {
             log.info("armoryActivity,activityId:{}", activityId);
             boolean status = activityArmory.assembleActivityByActivityId(activityId);
@@ -131,6 +141,60 @@ public class ActivityGachaController implements IGachaActivityService {
             return Response.<ActivityDrawRes>builder()
                     .code(ResponseCode.UN_ERROR.getCode())
                     .info(ResponseCode.UN_ERROR.getInfo())
+                    .build();
+        }
+    }
+
+    @RequestMapping(value = "activity_daily_sign", method = RequestMethod.POST)
+    @Override
+    public Response<Boolean> activityDailySign(@RequestBody ActivityDailySignReq activityDailySignReq) {
+        String userId = activityDailySignReq.getUserId();
+        if(userId==null||StringUtils.isEmpty(userId)){
+            return Response.<Boolean>builder()
+                    .code(ResponseCode.ILLEGAL_PARAMETER.getCode())
+                    .info(ResponseCode.ILLEGAL_PARAMETER.getInfo())
+                    .build();
+        }
+        try{
+            RebateBehaviorEntity rebateBehaviorEntity =  new RebateBehaviorEntity();
+            rebateBehaviorEntity.setBehaviorType(BehaviorTypeVO.DAILY_SIGN);
+            rebateBehaviorEntity.setUserId(userId);
+            rebateBehaviorEntity.setOutBusinessNo(dateFormatDay.format(new Date()));
+            behaviorRebateService.saveRebateOrder(rebateBehaviorEntity);
+            return Response.<Boolean>builder()
+                    .code(ResponseCode.SUCCESS.getCode())
+                    .info(ResponseCode.SUCCESS.getInfo())
+                    .data(true)
+                    .build();
+        } catch (Exception e) {
+            log.error("活动每日签到错误, userId:{}",userId,e);
+            return Response.<Boolean>builder()
+                    .code(ResponseCode.UN_ERROR.getCode())
+                    .info(ResponseCode.UN_ERROR.getInfo())
+                    .build();
+        }
+    }
+
+    @RequestMapping(value = "activity_has_daily_sign", method = RequestMethod.POST)
+    @Override
+    public Response<Boolean> hasActivityDailySign(@RequestBody ActivityDailySignReq activityDailySignReq) {
+        String userId = activityDailySignReq.getUserId();
+        try {
+            log.info("查询用户是否完成日历签到返利开始 userId:{}", userId);
+            String outBusinessNo = dateFormatDay.format(new Date());
+            List<RebateOrderEntity> rebateOrderEntities = behaviorRebateService.queryOrderByOutBusinessNo(userId, outBusinessNo);
+            log.info("查询用户是否完成日历签到返利完成 userId:{} orders.size:{}", userId, rebateOrderEntities.size());
+            return Response.<Boolean>builder()
+                    .code(ResponseCode.SUCCESS.getCode())
+                    .info(ResponseCode.SUCCESS.getInfo())
+                    .data(!rebateOrderEntities.isEmpty()) // 只要不为空，则表示已经做了签到
+                    .build();
+        } catch (Exception e) {
+            log.error("查询用户是否完成日历签到返利失败 userId:{}", userId, e);
+            return Response.<Boolean>builder()
+                    .code(ResponseCode.UN_ERROR.getCode())
+                    .info(ResponseCode.UN_ERROR.getInfo())
+                    .data(false)
                     .build();
         }
     }

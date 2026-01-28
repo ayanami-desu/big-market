@@ -37,8 +37,8 @@ public class BehaviorRebateOrderEnLis {
             SendRebateMessageEvent.SendRebateMessage rebateMsg = eventMessage.getData();
             if(rebateMsg.getRebateType().equals(RebateTypeVO.SKU.getCode())){
                 ActivityChargeEntity activityChargeEntity = new ActivityChargeEntity();
-                activityChargeEntity.setUserId("hzx");
-                activityChargeEntity.setSku(9011L);
+                activityChargeEntity.setUserId(rebateMsg.getUserId());
+                activityChargeEntity.setSku(Long.valueOf(rebateMsg.getRebateConfig()));
                 activityChargeEntity.setBizId(rebateMsg.getBizId());
                 gachaActivityQuotaOrder.createGachaActivityOrder(activityChargeEntity);
             }else{

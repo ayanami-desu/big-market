@@ -1,5 +1,6 @@
 package re.yuugu.hzx.domain.strategy.repository;
 
+import re.yuugu.hzx.domain.strategy.model.entity.AwardEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.StrategyAwardEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.StrategyEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.StrategyRuleEntity;
@@ -45,4 +46,6 @@ public interface IStrategyRepository {
     Long queryStrategyIdByActivityId(Long activityId);
 
     Long queryUserGachaCount(String userId, Long strategyId);
+
+    AwardEntity queryAwardDetailById(Integer awardId);
 }

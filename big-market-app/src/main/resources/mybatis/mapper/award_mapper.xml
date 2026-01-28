@@ -8,14 +8,19 @@
         <result column="award_key" property="awardKey"/>
         <result column="award_config" property="awardConfig"/>
         <result column="award_desc" property="awardDesc"/>
+        <result column="award_title" property="awardTitle"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <select id="queryAwardList" resultMap="dataMap">
-        SELECT award_id,award_key,award_config,award_desc
+        SELECT award_id,award_key,award_config,award_desc,award_title
         FROM award
         limit 10
     </select>
-
+    <select id="queryAwardDetailById" resultMap="dataMap">
+        SELECT award_id,award_key,award_config,award_desc,award_title
+        FROM award
+        where award_id=#{awardId}
+    </select>
 </mapper>

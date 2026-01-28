@@ -26,4 +26,13 @@ public class UserAwardRecordEntity {
     private String awardTitle;
     private Date awardTime;
     private AwardStateVO awardState;
+
+    /**
+     * 用于发奖的字段
+     */
+    private String awardKey;
+    /**
+     * 用于发奖的字段
+     */
+    private String awardConfig;
 }

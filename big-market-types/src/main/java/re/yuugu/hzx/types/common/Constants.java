@@ -24,6 +24,7 @@ public class Constants {
         public static final String ACTIVITY_SKU_STOCK_QUEUE = "big_market_activity_sku_stock_queue_";
 
         public static final String REBATE_BEHAVIOR_CONFIG_KEY = "big_market_behavior_config_";
+        public static final String AWARD_ITEM_KEY = "big_market_award_item_key_";
     }
 
 }

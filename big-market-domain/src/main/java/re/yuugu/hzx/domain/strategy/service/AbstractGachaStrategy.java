@@ -2,6 +2,7 @@ package re.yuugu.hzx.domain.strategy.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import re.yuugu.hzx.domain.strategy.model.entity.AwardEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.GachaAwardEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.GachaFactorEntity;
 import re.yuugu.hzx.domain.strategy.repository.IStrategyRepository;
@@ -34,24 +35,21 @@ public abstract class AbstractGachaStrategy implements IGachaStrategy, IGachaAwa
         DefaultLogicChainFactory.ChainAwardVO chainAwardVO = processLogicChain(strategyId,userId);
         if(!DefaultLogicChainFactory.LogicChainType.RULE_DEFAULT.getCode().equals(chainAwardVO.getLogicChainType().getCode())){
             log.info(chainAwardVO.getLogicChainType().getCode());
-            return GachaAwardEntity.builder()
-                    .awardId(chainAwardVO.getAwardId())
-                    .awardDesc("直接发奖品")
-                    .build();
+            return buildAward(chainAwardVO.getAwardId());
         }
         //3. 规则树处理次数锁，库存，兜底奖品
         DefaultRuleTreeFactory.TreeAwardVO treeAwardVO = processLogicTree(strategyId,userId,chainAwardVO.getAwardId());
-        return GachaAwardEntity.builder()
-                .awardId(treeAwardVO.getAwardId())
-                .awardConfig(treeAwardVO.getAwardConfig())
-                // todo 查询数据库
-                .awardDesc("最终奖品")
-                .awardTitle("sss")
-                .build();
+        return buildAward(treeAwardVO.getAwardId());
 
     }
     private GachaAwardEntity buildAward(Integer awardId){
-        return null;
+        AwardEntity awardEntity =  strategyRepository.queryAwardDetailById(awardId);
+        return GachaAwardEntity.builder()
+                .awardId(awardEntity.getAwardId())
+                .awardKey(awardEntity.getAwardKey())
+                .awardConfig(awardEntity.getAwardConfig())
+                .awardTitle(awardEntity.getAwardTitle())
+                .build();
     }
     protected abstract DefaultLogicChainFactory.ChainAwardVO processLogicChain(Long strategyId,String userId);
     protected abstract DefaultRuleTreeFactory.TreeAwardVO processLogicTree(Long strategyId,String userId,Integer awardId);

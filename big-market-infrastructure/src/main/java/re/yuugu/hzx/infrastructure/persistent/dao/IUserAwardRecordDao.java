@@ -13,4 +13,6 @@ import re.yuugu.hzx.infrastructure.persistent.po.UserAwardRecord;
 @DBRouterStrategy(splitTable = true)
 public interface IUserAwardRecordDao {
     void insert(UserAwardRecord userAwardRecord);
+
+    int updateUserAwardRecordStateToCompleted(UserAwardRecord userAwardRecordReq);
 }

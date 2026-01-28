@@ -1,17 +1,20 @@
 package re.yuugu.hzx.domain.strategy.model.entity;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * @ author anon
+ * @ description AwardEntity
+ * @ create 2026/1/27 20:32
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class GachaAwardEntity {
-    private Long strategyId;
+public class AwardEntity {
     private Integer awardId;
     private String awardKey;
     private String awardConfig;

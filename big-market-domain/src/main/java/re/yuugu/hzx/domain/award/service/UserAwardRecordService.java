@@ -27,9 +27,11 @@ public class UserAwardRecordService implements IUserAwardRecordService {
     public void saveUserAwardRecord(UserAwardRecordEntity userAwardRecordEntity) {
         //消息实体对象
         SendAwardMessageEvent.SendAwardMessage sendAwardMessage = new SendAwardMessageEvent.SendAwardMessage();
-        sendAwardMessage.setAwardTitle(userAwardRecordEntity.getAwardTitle());
         sendAwardMessage.setAwardId(userAwardRecordEntity.getAwardId());
         sendAwardMessage.setUserId(userAwardRecordEntity.getUserId());
+        sendAwardMessage.setOrderId(userAwardRecordEntity.getOrderId());
+        sendAwardMessage.setAwardConfig(userAwardRecordEntity.getAwardConfig());
+        sendAwardMessage.setAwardKey(userAwardRecordEntity.getAwardKey());
         //mq 消息
         BaseEvent.EventMessage<SendAwardMessageEvent.SendAwardMessage> msg = sendAwardMessageEvent.buildEventMessage(sendAwardMessage);
 

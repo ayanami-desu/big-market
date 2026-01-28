@@ -121,6 +121,8 @@ public class ActivityGachaController implements IGachaActivityService {
                     .awardTitle(gachaAwardEntity.getAwardTitle())
                     .awardTime(new Date())
                     .awardState(AwardStateVO.create)
+                    .awardConfig(gachaAwardEntity.getAwardConfig())
+                    .awardKey(gachaAwardEntity.getAwardKey())
                     .build();
             userAwardRecordService.saveUserAwardRecord(userAwardRecordEntity);
             return Response.<ActivityDrawRes>builder()

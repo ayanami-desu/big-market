@@ -42,6 +42,8 @@ public class SendAwardMessageEvent extends BaseEvent<SendAwardMessageEvent.SendA
     public static class SendAwardMessage{
         private String userId;
         private Integer awardId;
-        private String awardTitle;
+        private String awardConfig;
+        private String awardKey;
+        private String orderId;
     }
 }

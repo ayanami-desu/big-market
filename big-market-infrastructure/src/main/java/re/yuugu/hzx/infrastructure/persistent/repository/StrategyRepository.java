@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBlockingQueue;
 import org.redisson.api.RDelayedQueue;
 import org.springframework.stereotype.Repository;
+import re.yuugu.hzx.domain.strategy.model.entity.AwardEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.StrategyAwardEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.StrategyEntity;
 import re.yuugu.hzx.domain.strategy.model.entity.StrategyRuleEntity;
@@ -44,6 +45,8 @@ public class StrategyRepository implements IStrategyRepository {
     private IGachaActivityDao activityDao;
     @Resource
     private IGachaActivityAccountDao activityAccountDao;
+    @Resource
+    private IAwardDao awardDao;
 
     @Resource
     private IRedisService redisService;
@@ -293,5 +296,26 @@ public class StrategyRepository implements IStrategyRepository {
             return 0L;
         }
         return (long) (gachaActivityAccount.getTotalCount()-gachaActivityAccount.getTotalCountSurplus());
+    }
+
+    @Override
+    public AwardEntity queryAwardDetailById(Integer awardId) {
+        String cacheKey = Constants.RedisKeys.AWARD_ITEM_KEY+awardId;
+        AwardEntity awardEntity = redisService.getValue(cacheKey);
+        if (awardEntity != null) {
+            return awardEntity;
+        }
+        Award award = awardDao.queryAwardDetailById(awardId);
+        if (award == null) {
+            throw new RuntimeException("未查询到奖品详情, awardId: "+awardId);
+        }
+        awardEntity = AwardEntity.builder()
+                .awardKey(award.getAwardKey())
+                .awardConfig(award.getAwardConfig())
+                .awardId(award.getAwardId())
+                .awardTitle(award.getAwardTitle())
+                .build();
+        redisService.setValue(cacheKey, awardEntity);
+        return awardEntity;
     }
 }

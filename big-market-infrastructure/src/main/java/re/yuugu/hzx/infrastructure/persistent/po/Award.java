@@ -10,6 +10,7 @@ public class Award {
     private String awardKey;
     private String awardConfig;
     private String awardDesc;
+    private String awardTitle;
     private Date CreateTime;
     private Date UpdateTime;
 }

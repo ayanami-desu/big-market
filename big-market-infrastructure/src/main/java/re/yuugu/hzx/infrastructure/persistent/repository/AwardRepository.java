@@ -6,10 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.support.TransactionTemplate;
+import re.yuugu.hzx.domain.award.event.SendAwardMessageEvent;
 import re.yuugu.hzx.domain.award.model.aggregate.CreateUserAwardRecordAggregate;
 import re.yuugu.hzx.domain.award.model.aggregate.DistributeCreditAwardAggregate;
 import re.yuugu.hzx.domain.award.model.entity.CreditAwardEntity;
-import re.yuugu.hzx.domain.award.model.entity.TaskEntity;
 import re.yuugu.hzx.domain.award.model.entity.UserAwardRecordEntity;
 import re.yuugu.hzx.domain.award.repository.IAwardRepository;
 import re.yuugu.hzx.domain.strategy.model.entity.AwardEntity;
@@ -22,6 +22,7 @@ import re.yuugu.hzx.infrastructure.persistent.po.UserGachaOrder;
 import re.yuugu.hzx.infrastructure.persistent.redis.IRedisService;
 import re.yuugu.hzx.types.common.Constants;
 import re.yuugu.hzx.types.enums.ResponseCode;
+import re.yuugu.hzx.types.event.EventTask;
 import re.yuugu.hzx.types.exception.AppException;
 
 import javax.annotation.Resource;
@@ -57,7 +58,7 @@ public class AwardRepository implements IAwardRepository {
     @Override
     public void doSaveUserAwardRecordAggregate(CreateUserAwardRecordAggregate createUserAwardRecordAggregate) {
         UserAwardRecordEntity userAwardRecordEntity = createUserAwardRecordAggregate.getUserAwardRecord();
-        TaskEntity taskEntity = createUserAwardRecordAggregate.getTask();
+        EventTask<SendAwardMessageEvent.SendAwardMessage> eventTask  = createUserAwardRecordAggregate.getEventTask();
         UserAwardRecord userAwardRecord = UserAwardRecord.builder()
                 .userId(userAwardRecordEntity.getUserId())
                 .activityId(userAwardRecordEntity.getActivityId())
@@ -69,11 +70,11 @@ public class AwardRepository implements IAwardRepository {
                 .awardState(userAwardRecordEntity.getAwardState().getCode())
                 .build();
         Task task = Task.builder()
-                .userId(taskEntity.getUserId())
-                .topic(taskEntity.getTopic())
-                .message(JSON.toJSONString(taskEntity.getMessage()))
-                .messageId(taskEntity.getMessageId())
-                .state(taskEntity.getState().getCode())
+                .userId(eventTask.getUserId())
+                .topic(eventTask.getTopic())
+                .message(JSON.toJSONString(eventTask.getMessage()))
+                .messageId(eventTask.getMessageId())
+                .state(eventTask.getState().getCode())
                 .build();
         UserGachaOrder userGachaOrderReq = new UserGachaOrder();
         userGachaOrderReq.setUserId(userAwardRecordEntity.getUserId());
@@ -95,6 +96,10 @@ public class AwardRepository implements IAwardRepository {
                     status.setRollbackOnly();
                     log.error("写入中奖记录，唯一索引冲突", e);
                     throw new AppException(ResponseCode.DUPLICATE_KEY_EXCEPTION.getCode(), ResponseCode.DUPLICATE_KEY_EXCEPTION.getInfo());
+                }catch (Exception e){
+                    status.setRollbackOnly();
+                    log.error("写入中奖记录，错误", e);
+                    throw e;
                 }
             });
 
@@ -103,7 +108,7 @@ public class AwardRepository implements IAwardRepository {
         }
         // 发送 mq 消息
         try {
-            eventPublisher.publish(task.getTopic(), taskEntity.getMessage());
+            eventPublisher.publish(eventTask.getTopic(), eventTask.getMessage());
             taskDao.updateStateToCompleted(task);
         } catch (Exception e) {
             log.error("写入中奖记录，发送mq消息失败");
@@ -141,8 +146,13 @@ public class AwardRepository implements IAwardRepository {
                     return 1;
                 } catch (DuplicateKeyException e) {
                     status.setRollbackOnly();
-                    log.error("发放积分奖励时出错", e);
+                    log.error("发放积分奖励时, 唯一索引冲突", e);
                     throw new AppException(ResponseCode.DUPLICATE_KEY_EXCEPTION.getCode(), ResponseCode.DUPLICATE_KEY_EXCEPTION.getInfo());
+                }
+                catch (Exception e){
+                    status.setRollbackOnly();
+                    log.error("发放积分奖励时出错", e);
+                    throw e;
                 }
             });
         } finally {

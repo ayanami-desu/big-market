@@ -61,6 +61,6 @@ public class SendRebateMessageEvent extends BaseEvent<SendRebateMessageEvent.Sen
         /**
          * 业务 id
          */
-        private String bizId;
+        private String outBusinessNo;
     }
 }

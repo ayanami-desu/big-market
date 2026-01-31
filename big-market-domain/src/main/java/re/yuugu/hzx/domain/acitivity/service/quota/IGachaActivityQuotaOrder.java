@@ -1,6 +1,7 @@
 package re.yuugu.hzx.domain.acitivity.service.quota;
 
 import re.yuugu.hzx.domain.acitivity.model.entity.ActivityChargeEntity;
+import re.yuugu.hzx.domain.acitivity.model.entity.UpdateGachaActivityOrderEntity;
 
 /**
  * @ author anon
@@ -9,4 +10,6 @@ import re.yuugu.hzx.domain.acitivity.model.entity.ActivityChargeEntity;
  */
 public interface IGachaActivityQuotaOrder {
     String createGachaActivityOrder(ActivityChargeEntity activityChargeEntity);
+
+    void updateGachaActivityOrderState(UpdateGachaActivityOrderEntity updateGachaActivityOrderEntity);
 }

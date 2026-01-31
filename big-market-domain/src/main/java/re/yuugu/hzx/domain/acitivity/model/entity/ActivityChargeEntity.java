@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import re.yuugu.hzx.domain.acitivity.model.vo.TradeOrderTypeVO;
 
 /**
  * @ author anon
@@ -20,5 +21,6 @@ public class ActivityChargeEntity {
     /**
      * 外部透传字段，保证订单唯一性
      */
-    private String bizId;
+    private String outBusinessNo;
+    private TradeOrderTypeVO tradePolicy;
 }

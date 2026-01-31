@@ -21,7 +21,6 @@ public interface IActivityRepository {
 
     ActivityCountEntity queryActivityCountByActivityCountId(Long activityCountId);
 
-    void saveOrder(CreateSkuOrderAggregate createSkuOrderAggregate);
 
     boolean subtractActivitySkuStock(Long sku, Date endDateTime);
 
@@ -53,4 +52,10 @@ public interface IActivityRepository {
     List<UserGachaOrderEntity> queryNoUsedGachaOrder(String userId, Long activityId);
 
     List<ActivitySkuEntity> queryActivitySkuListByActivityId(Long activityId);
+
+    void doSaveCreditPayActivityOrderAggregate(CreateSkuOrderAggregate createSkuOrderAggregate);
+
+    void doSaveRebateNoPayActivityOrderAggregate(CreateSkuOrderAggregate createSkuOrderAggregate);
+
+    void updateGachaActivityOrderState(UpdateGachaActivityOrderEntity updateGachaActivityOrderEntity);
 }

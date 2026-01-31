@@ -4,13 +4,14 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 import re.yuugu.hzx.domain.acitivity.model.aggregate.CreateSkuOrderAggregate;
 import re.yuugu.hzx.domain.acitivity.model.entity.*;
-import re.yuugu.hzx.domain.acitivity.model.vo.ActivityQuotaOrderState;
 import re.yuugu.hzx.domain.acitivity.model.vo.SkuStockKeyVO;
 import re.yuugu.hzx.domain.acitivity.repository.IActivityRepository;
 import re.yuugu.hzx.domain.acitivity.service.quota.chain.factory.DefaultActionChainFactory;
+import re.yuugu.hzx.domain.acitivity.service.quota.trade.ITradePolicy;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * @ author anon
@@ -22,23 +23,19 @@ public class GachaActivityQuotaService extends AbstractGachaActivityQuota {
     @Resource
     private IActivityRepository activityRepository;
 
-    public GachaActivityQuotaService(IActivityRepository activityRepository, DefaultActionChainFactory defaultActionChainFactory) {
-        super(activityRepository, defaultActionChainFactory);
+    public GachaActivityQuotaService(IActivityRepository activityRepository, DefaultActionChainFactory defaultActionChainFactory, Map<String, ITradePolicy> tradePolicyGroup) {
+        super(activityRepository, defaultActionChainFactory, tradePolicyGroup);
     }
 
-    @Override
-    protected void doSaveOrder(CreateSkuOrderAggregate createSkuOrderAggregate) {
-        activityRepository.saveOrder(createSkuOrderAggregate);
-    }
 
     @Override
     protected CreateSkuOrderAggregate aggregateOrder(ActivityChargeEntity activityChargeEntity, ActivitySkuEntity activitySkuEntity, ActivityEntity activityEntity, ActivityCountEntity activityCountEntity) {
         ActivityOrderEntity activityOrderEntity = new ActivityOrderEntity();
 
-
         activityOrderEntity.setUserId(activityChargeEntity.getUserId());
         activityOrderEntity.setSku(activityChargeEntity.getSku());
-        activityOrderEntity.setBizId(activityChargeEntity.getBizId());
+        activityOrderEntity.setSkuPrice(activitySkuEntity.getSkuPrice());
+        activityOrderEntity.setOutBusinessNo(activityChargeEntity.getOutBusinessNo());
 
         activityOrderEntity.setActivityId(activitySkuEntity.getActivityId());
         activityOrderEntity.setActivityName(activityEntity.getActivityName());
@@ -51,7 +48,6 @@ public class GachaActivityQuotaService extends AbstractGachaActivityQuota {
         // 公司里一般会有专门的雪花算法UUID服务，我们这里直接生成个12位就可以了。
         activityOrderEntity.setOrderId(RandomStringUtils.randomNumeric(12));
         activityOrderEntity.setOrderTime(new Date());
-        activityOrderEntity.setState(ActivityQuotaOrderState.completed.getCode());
 
         CreateSkuOrderAggregate createSkuOrderAggregate = new CreateSkuOrderAggregate();
         createSkuOrderAggregate.setActivityOrderEntity(activityOrderEntity);
@@ -76,5 +72,10 @@ public class GachaActivityQuotaService extends AbstractGachaActivityQuota {
     @Override
     public void clearSkuStock(Long sku) {
         activityRepository.clearSkuStock(sku);
+    }
+
+    @Override
+    public void updateGachaActivityOrderState(UpdateGachaActivityOrderEntity updateGachaActivityOrderEntity) {
+        activityRepository.updateGachaActivityOrderState(updateGachaActivityOrderEntity);
     }
 }

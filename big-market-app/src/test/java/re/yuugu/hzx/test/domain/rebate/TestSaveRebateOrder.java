@@ -25,12 +25,12 @@ public class TestSaveRebateOrder {
     private IBehaviorRebateService behaviorRebateService;
 
     @Test
-    public void test_saveRebateOrder() throws InterruptedException {
+    public void test_DailySignRebate() throws InterruptedException {
         for (int i = 0; i < 1; i++) {
-            RebateBehaviorEntity rebateBehaviorEntity =  new RebateBehaviorEntity();
+            RebateBehaviorEntity rebateBehaviorEntity = new RebateBehaviorEntity();
             rebateBehaviorEntity.setBehaviorType(BehaviorTypeVO.DAILY_SIGN);
             rebateBehaviorEntity.setUserId("hzx");
-            rebateBehaviorEntity.setOutBusinessNo("2026-01-24");
+            rebateBehaviorEntity.setOutBusinessNo("2026-01-29");
 
             behaviorRebateService.saveRebateOrder(rebateBehaviorEntity);
             Thread.sleep(500);

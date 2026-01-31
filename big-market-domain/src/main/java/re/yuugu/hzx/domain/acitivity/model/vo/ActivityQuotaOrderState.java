@@ -12,6 +12,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ActivityQuotaOrderState {
     completed("completed","已完成"),
+    wait_to_pay("wait_to_pay","待支付"),
     ;
     private final String code;
     private final String info;

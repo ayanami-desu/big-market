@@ -5,6 +5,7 @@
     <resultMap id="dataMap" type="re.yuugu.hzx.infrastructure.persistent.po.GachaActivitySku">
         <id column="id" property="id"/>
         <result column="sku" property="sku"/>
+        <result column="sku_price" property="skuPrice"/>
         <result column="activity_id" property="activityId"/>
         <result column="activity_count_id" property="activityCountId"/>
         <result column="stock_count" property="stockCount"/>
@@ -15,26 +16,26 @@
     </resultMap>
 
     <select id="queryGachaActivitySku" resultMap="dataMap">
-        SELECT sku,activity_id,activity_count_id,stock_count,stock_count_surplus
+        SELECT sku, sku_price, activity_id, activity_count_id, stock_count, stock_count_surplus
         FROM gacha_activity_sku
-        where sku=#{sku}
+        where sku = #{sku}
     </select>
     <select id="queryActivitySkuListByActivityId" resultMap="dataMap">
-        SELECT sku,activity_id,activity_count_id,stock_count,stock_count_surplus
+        SELECT sku, sku_price, activity_id, activity_count_id, stock_count, stock_count_surplus
         FROM gacha_activity_sku
-        where activity_id=#{activityId}
+        where activity_id = #{activityId}
     </select>
     <update id="updateSkuStock">
         update gacha_activity_sku
         set stock_count_surplus = stock_count_surplus - 1,
-            update_time = now()
+            update_time         = now()
         WHERE sku = #{sku}
           AND stock_count_surplus > 0
     </update>
     <update id="clearSkuStock">
         update gacha_activity_sku
         set stock_count_surplus = 0,
-            update_time = now()
+            update_time         = now()
         WHERE sku = #{sku}
     </update>
 

@@ -74,6 +74,7 @@ public class ActivityRepository implements IActivityRepository {
         GachaActivitySku gachaActivitySku = activitySkuDao.queryGachaActivitySku(sku);
         activitySkuEntity = ActivitySkuEntity.builder()
                 .sku(gachaActivitySku.getSku())
+                .skuPrice(gachaActivitySku.getSkuPrice())
                 .activityId(gachaActivitySku.getActivityId())
                 .activityCountId(gachaActivitySku.getActivityCountId())
                 .stockCount(gachaActivitySku.getStockCount())
@@ -118,75 +119,6 @@ public class ActivityRepository implements IActivityRepository {
                 .build();
         redisService.setValue(cacheKey, activityCountEntity);
         return activityCountEntity;
-    }
-
-    @Override
-    public void saveOrder(CreateSkuOrderAggregate createSkuOrderAggregate) {
-        try {
-            ActivityOrderEntity activityOrderEntity = createSkuOrderAggregate.getActivityOrderEntity();
-            GachaActivityOrder gachaActivityOrder = new GachaActivityOrder();
-
-            gachaActivityOrder.setUserId(activityOrderEntity.getUserId());
-            gachaActivityOrder.setSku(activityOrderEntity.getSku());
-            gachaActivityOrder.setActivityId(activityOrderEntity.getActivityId());
-            gachaActivityOrder.setActivityName(activityOrderEntity.getActivityName());
-            gachaActivityOrder.setStrategyId(activityOrderEntity.getStrategyId());
-            gachaActivityOrder.setOrderId(activityOrderEntity.getOrderId());
-            gachaActivityOrder.setOrderTime(activityOrderEntity.getOrderTime());
-            gachaActivityOrder.setTotalCount(activityOrderEntity.getTotalCount());
-            gachaActivityOrder.setMonthCount(activityOrderEntity.getMonthCount());
-            gachaActivityOrder.setDayCount(activityOrderEntity.getDayCount());
-            gachaActivityOrder.setState(activityOrderEntity.getState());
-            gachaActivityOrder.setBizId(activityOrderEntity.getBizId());
-
-            GachaActivityAccount gachaActivityAccount = new GachaActivityAccount();
-            gachaActivityAccount.setUserId(activityOrderEntity.getUserId());
-            gachaActivityAccount.setActivityId(activityOrderEntity.getActivityId());
-            gachaActivityAccount.setTotalCount(activityOrderEntity.getTotalCount());
-            gachaActivityAccount.setTotalCountSurplus(activityOrderEntity.getTotalCount());
-            gachaActivityAccount.setDayCount(activityOrderEntity.getDayCount());
-            gachaActivityAccount.setDayCountSurplus(activityOrderEntity.getDayCount());
-            gachaActivityAccount.setMonthCount(activityOrderEntity.getMonthCount());
-            gachaActivityAccount.setMonthCountSurplus(activityOrderEntity.getMonthCount());
-
-            GachaActivityAccountMonth gachaActivityAccountMonth = new GachaActivityAccountMonth();
-            gachaActivityAccountMonth.setUserId(activityOrderEntity.getUserId());
-            gachaActivityAccountMonth.setActivityId(activityOrderEntity.getActivityId());
-            gachaActivityAccountMonth.setMonth(gachaActivityAccountMonth.currentMonth());
-            gachaActivityAccountMonth.setMonthCount(activityOrderEntity.getMonthCount());
-            gachaActivityAccountMonth.setMonthCountSurplus(activityOrderEntity.getMonthCount());
-
-            GachaActivityAccountDay gachaActivityAccountDay = new GachaActivityAccountDay();
-            gachaActivityAccountDay.setUserId(activityOrderEntity.getUserId());
-            gachaActivityAccountDay.setActivityId(activityOrderEntity.getActivityId());
-            gachaActivityAccountDay.setDay(gachaActivityAccountDay.currentDay());
-            gachaActivityAccountDay.setDayCount(activityOrderEntity.getDayCount());
-            gachaActivityAccountDay.setDayCountSurplus(activityOrderEntity.getDayCount());
-
-            //只要这里设置了路由，后面的方法都会自动根据路由结果进行分库
-            //至于分表则需要在 dao 中设置注解
-            dbRouter.doRouter(activityOrderEntity.getUserId());
-            transactionTemplate.execute(status -> {
-                try {
-                    activityOrderDao.insert(gachaActivityOrder);
-                    int count = activityAccountDao.updateAccountQuota(gachaActivityAccount);
-                    if (count == 0) {
-                        activityAccountDao.insert(gachaActivityAccount);
-                    }
-                    //抽奖时月日度账户不存在会重新创建,这里就不用判断有没有了,有就更新,更新失败就不用管了
-                    //“如果有，就需要更新”
-                    activityAccountDayDao.addAccountQuota(gachaActivityAccountDay);
-                    activityAccountMonthDao.addAccountQuota(gachaActivityAccountMonth);
-                    return 1;
-                } catch (DuplicateKeyException e) {
-                    status.setRollbackOnly();
-                    log.error("写入订单记录，唯一索引冲突");
-                    throw new AppException(ResponseCode.DUPLICATE_KEY_EXCEPTION.getCode(), ResponseCode.DUPLICATE_KEY_EXCEPTION.getInfo());
-                }
-            });
-        } finally {
-            dbRouter.clear();
-        }
     }
 
     @Override
@@ -451,5 +383,133 @@ public class ActivityRepository implements IActivityRepository {
             activitySkuEntities.add(activitySkuEntity);
         }
         return activitySkuEntities;
+    }
+
+    @Override
+    public void doSaveRebateNoPayActivityOrderAggregate(CreateSkuOrderAggregate createSkuOrderAggregate) {
+        ActivityOrderEntity activityOrderEntity = createSkuOrderAggregate.getActivityOrderEntity();
+        GachaActivityOrder gachaActivityOrder = new GachaActivityOrder();
+
+        gachaActivityOrder.setUserId(activityOrderEntity.getUserId());
+        gachaActivityOrder.setSku(activityOrderEntity.getSku());
+        gachaActivityOrder.setSkuPrice(activityOrderEntity.getSkuPrice());
+        gachaActivityOrder.setActivityId(activityOrderEntity.getActivityId());
+        gachaActivityOrder.setActivityName(activityOrderEntity.getActivityName());
+        gachaActivityOrder.setStrategyId(activityOrderEntity.getStrategyId());
+        gachaActivityOrder.setOrderId(activityOrderEntity.getOrderId());
+        gachaActivityOrder.setOrderTime(activityOrderEntity.getOrderTime());
+        gachaActivityOrder.setTotalCount(activityOrderEntity.getTotalCount());
+        gachaActivityOrder.setMonthCount(activityOrderEntity.getMonthCount());
+        gachaActivityOrder.setDayCount(activityOrderEntity.getDayCount());
+        gachaActivityOrder.setState(activityOrderEntity.getState().getCode());
+        gachaActivityOrder.setOutBusinessNo(activityOrderEntity.getOutBusinessNo());
+
+        GachaActivityAccount gachaActivityAccount = new GachaActivityAccount();
+        gachaActivityAccount.setUserId(activityOrderEntity.getUserId());
+        gachaActivityAccount.setActivityId(activityOrderEntity.getActivityId());
+        gachaActivityAccount.setTotalCount(activityOrderEntity.getTotalCount());
+        gachaActivityAccount.setTotalCountSurplus(activityOrderEntity.getTotalCount());
+        gachaActivityAccount.setDayCount(activityOrderEntity.getDayCount());
+        gachaActivityAccount.setDayCountSurplus(activityOrderEntity.getDayCount());
+        gachaActivityAccount.setMonthCount(activityOrderEntity.getMonthCount());
+        gachaActivityAccount.setMonthCountSurplus(activityOrderEntity.getMonthCount());
+
+        GachaActivityAccountMonth gachaActivityAccountMonth = new GachaActivityAccountMonth();
+        gachaActivityAccountMonth.setUserId(activityOrderEntity.getUserId());
+        gachaActivityAccountMonth.setActivityId(activityOrderEntity.getActivityId());
+        gachaActivityAccountMonth.setMonth(gachaActivityAccountMonth.currentMonth());
+        gachaActivityAccountMonth.setMonthCount(activityOrderEntity.getMonthCount());
+        gachaActivityAccountMonth.setMonthCountSurplus(activityOrderEntity.getMonthCount());
+
+        GachaActivityAccountDay gachaActivityAccountDay = new GachaActivityAccountDay();
+        gachaActivityAccountDay.setUserId(activityOrderEntity.getUserId());
+        gachaActivityAccountDay.setActivityId(activityOrderEntity.getActivityId());
+        gachaActivityAccountDay.setDay(gachaActivityAccountDay.currentDay());
+        gachaActivityAccountDay.setDayCount(activityOrderEntity.getDayCount());
+        gachaActivityAccountDay.setDayCountSurplus(activityOrderEntity.getDayCount());
+
+        try {
+            //只要这里设置了路由，后面的方法都会自动根据路由结果进行分库
+            //至于分表则需要在 dao 中设置注解
+            dbRouter.doRouter(activityOrderEntity.getUserId());
+            transactionTemplate.execute(status -> {
+                try {
+                    activityOrderDao.insert(gachaActivityOrder);
+                    int count = activityAccountDao.updateAccountQuota(gachaActivityAccount);
+                    if (count != 1) {
+                        activityAccountDao.insert(gachaActivityAccount);
+                    }
+                    //抽奖时月日度账户不存在会重新创建,这里就不用判断有没有了,有就更新,更新失败就不用管了
+                    //“如果有，就需要更新”
+                    activityAccountDayDao.addAccountQuota(gachaActivityAccountDay);
+                    activityAccountMonthDao.addAccountQuota(gachaActivityAccountMonth);
+                    return 1;
+                } catch (DuplicateKeyException e) {
+                    status.setRollbackOnly();
+                    log.error("写入订单记录，唯一索引冲突");
+                    throw new AppException(ResponseCode.DUPLICATE_KEY_EXCEPTION.getCode(), ResponseCode.DUPLICATE_KEY_EXCEPTION.getInfo());
+                } catch (Exception e) {
+                    status.setRollbackOnly();
+                    log.error("写入订单记录，出现错误");
+                    throw e;
+                }
+            });
+        } finally {
+            dbRouter.clear();
+        }
+    }
+
+    @Override
+    public void updateGachaActivityOrderState(UpdateGachaActivityOrderEntity updateGachaActivityOrderEntity) {
+        GachaActivityOrder gachaActivityOrderReq =  new GachaActivityOrder();
+        gachaActivityOrderReq.setUserId(updateGachaActivityOrderEntity.getUserId());
+        gachaActivityOrderReq.setOutBusinessNo(updateGachaActivityOrderEntity.getOutBusinessNo());
+
+        activityOrderDao.updateOrderStateToCompleted(gachaActivityOrderReq);
+
+
+    }
+
+    @Override
+    public void doSaveCreditPayActivityOrderAggregate(CreateSkuOrderAggregate createSkuOrderAggregate) {
+        //只保存订单，不更新活动账户
+        ActivityOrderEntity activityOrderEntity = createSkuOrderAggregate.getActivityOrderEntity();
+        GachaActivityOrder gachaActivityOrder = new GachaActivityOrder();
+
+        gachaActivityOrder.setUserId(activityOrderEntity.getUserId());
+        gachaActivityOrder.setSku(activityOrderEntity.getSku());
+        gachaActivityOrder.setSkuPrice(activityOrderEntity.getSkuPrice());
+        gachaActivityOrder.setActivityId(activityOrderEntity.getActivityId());
+        gachaActivityOrder.setActivityName(activityOrderEntity.getActivityName());
+        gachaActivityOrder.setStrategyId(activityOrderEntity.getStrategyId());
+        gachaActivityOrder.setOrderId(activityOrderEntity.getOrderId());
+        gachaActivityOrder.setOrderTime(activityOrderEntity.getOrderTime());
+        gachaActivityOrder.setTotalCount(activityOrderEntity.getTotalCount());
+        gachaActivityOrder.setMonthCount(activityOrderEntity.getMonthCount());
+        gachaActivityOrder.setDayCount(activityOrderEntity.getDayCount());
+        gachaActivityOrder.setState(activityOrderEntity.getState().getCode());
+        gachaActivityOrder.setOutBusinessNo(activityOrderEntity.getOutBusinessNo());
+
+        try {
+            //只要这里设置了路由，后面的方法都会自动根据路由结果进行分库
+            //至于分表则需要在 dao 中设置注解
+            dbRouter.doRouter(activityOrderEntity.getUserId());
+            transactionTemplate.execute(status -> {
+                try {
+                    activityOrderDao.insert(gachaActivityOrder);
+                    return 1;
+                } catch (DuplicateKeyException e) {
+                    status.setRollbackOnly();
+                    log.error("写入订单记录，唯一索引冲突");
+                    throw new AppException(ResponseCode.DUPLICATE_KEY_EXCEPTION.getCode(), ResponseCode.DUPLICATE_KEY_EXCEPTION.getInfo());
+                } catch (Exception e) {
+                    status.setRollbackOnly();
+                    log.error("写入订单记录，出现错误");
+                    throw e;
+                }
+            });
+        } finally {
+            dbRouter.clear();
+        }
     }
 }

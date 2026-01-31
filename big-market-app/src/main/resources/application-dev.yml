@@ -29,6 +29,7 @@ spring:
       activity_sku_stock_zero: activity_sku_stock_zero
       send_award_message: send_award_message
       send_rebate_message: send_rebate_message
+      credit_pay_success: credit_pay_success
 
 # 线程池配置
 thread:

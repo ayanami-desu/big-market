@@ -2,6 +2,7 @@ package re.yuugu.hzx.infrastructure.persistent.po;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -17,6 +18,10 @@ public class GachaActivitySku {
      * 商品 sku
      */
     private Long sku;
+    /**
+     * sku 价格
+     */
+    private BigDecimal skuPrice;
     /**
      * 活动 ID
      */

@@ -4,8 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import re.yuugu.hzx.domain.rebate.event.SendRebateMessageEvent;
 import re.yuugu.hzx.domain.rebate.model.entity.RebateOrderEntity;
-import re.yuugu.hzx.domain.rebate.model.entity.TaskEntity;
+import re.yuugu.hzx.types.event.EventTask;
 
 /**
  * @ author anon
@@ -19,5 +20,5 @@ import re.yuugu.hzx.domain.rebate.model.entity.TaskEntity;
 public class CreateRebateOrderAggregate {
     private String userId;
     private RebateOrderEntity rebateOrderEntity;
-    private TaskEntity taskEntity;
+    private EventTask<SendRebateMessageEvent.SendRebateMessage> eventTask;
 }

@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 /**
  * @ author anon
  * @ description ActivitySkuEntity
@@ -19,6 +21,10 @@ public class ActivitySkuEntity {
      * 商品 sku
      */
     private Long sku;
+    /**
+     * sku 价格
+     */
+    private BigDecimal skuPrice;
     /**
      * 活动 ID
      */

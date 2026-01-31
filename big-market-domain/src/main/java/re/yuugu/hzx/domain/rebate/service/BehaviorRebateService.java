@@ -6,12 +6,11 @@ import re.yuugu.hzx.domain.rebate.event.SendRebateMessageEvent;
 import re.yuugu.hzx.domain.rebate.model.aggregate.CreateRebateOrderAggregate;
 import re.yuugu.hzx.domain.rebate.model.entity.RebateBehaviorEntity;
 import re.yuugu.hzx.domain.rebate.model.entity.RebateOrderEntity;
-import re.yuugu.hzx.domain.rebate.model.entity.TaskEntity;
 import re.yuugu.hzx.domain.rebate.model.vo.BehaviorRebateVO;
-import re.yuugu.hzx.domain.rebate.model.vo.TaskStateVO;
 import re.yuugu.hzx.domain.rebate.repository.IBehaviorRebateRepository;
 import re.yuugu.hzx.types.common.Constants;
 import re.yuugu.hzx.types.event.BaseEvent;
+import re.yuugu.hzx.types.event.EventTask;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -58,23 +57,19 @@ public class BehaviorRebateService implements IBehaviorRebateService {
             msg.setUserId(userId);
             msg.setBehaviorType(behaviorRebateVO.getBehaviorType().getCode());
             msg.setRebateType(behaviorRebateVO.getRebateType().getCode());
-            msg.setBizId(bizId);
+            msg.setRebateConfig(behaviorRebateVO.getRebateConfig());
+            // 对于其他服务，outBusinessNo 应该是这里的 bizId
+            msg.setOutBusinessNo(bizId);
+
             // mq 消息对象
             BaseEvent.EventMessage<SendRebateMessageEvent.SendRebateMessage> mqMsg = sendRebateMessageEvent.buildEventMessage(msg);
-
             // task 对象
-            TaskEntity taskEntity = TaskEntity.builder()
-                    .userId(userId)
-                    .topic(sendRebateMessageEvent.topic())
-                    .message(mqMsg)
-                    .messageId(mqMsg.getId())
-                    .state(TaskStateVO.create)
-                    .build();
+            EventTask<SendRebateMessageEvent.SendRebateMessage> eventTask = new EventTask<>(mqMsg,userId,sendRebateMessageEvent.topic());
             // 构建聚合对象
             CreateRebateOrderAggregate createRebateOrderAggregate = new CreateRebateOrderAggregate();
             createRebateOrderAggregate.setUserId(userId);
             createRebateOrderAggregate.setRebateOrderEntity(rebateOrderEntity);
-            createRebateOrderAggregate.setTaskEntity(taskEntity);
+            createRebateOrderAggregate.setEventTask(eventTask);
 
             // 保存聚合对象
             behaviorRebateRepository.doSaveRebateOrderAggregate(createRebateOrderAggregate);

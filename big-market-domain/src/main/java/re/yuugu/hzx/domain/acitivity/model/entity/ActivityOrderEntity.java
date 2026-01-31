@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import re.yuugu.hzx.domain.acitivity.model.vo.ActivityQuotaOrderState;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -26,6 +28,10 @@ public class ActivityOrderEntity {
      * 商品 sku
      */
     private Long sku;
+    /**
+     * sku 价格
+     */
+    private BigDecimal skuPrice;
 
     /**
      * 活动 ID
@@ -70,10 +76,10 @@ public class ActivityOrderEntity {
     /**
      * 订单状态
      */
-    private String state;
+    private ActivityQuotaOrderState state;
 
     /**
      * 外部透传字段，保证订单唯一性
      */
-    private String bizId;
+    private String outBusinessNo;
 }

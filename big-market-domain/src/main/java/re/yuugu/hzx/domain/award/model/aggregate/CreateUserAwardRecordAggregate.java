@@ -4,8 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import re.yuugu.hzx.domain.award.model.entity.TaskEntity;
+import re.yuugu.hzx.domain.award.event.SendAwardMessageEvent;
 import re.yuugu.hzx.domain.award.model.entity.UserAwardRecordEntity;
+import re.yuugu.hzx.types.event.EventTask;
 
 /**
  * @ author anon
@@ -18,5 +19,5 @@ import re.yuugu.hzx.domain.award.model.entity.UserAwardRecordEntity;
 @Builder
 public class CreateUserAwardRecordAggregate {
     private UserAwardRecordEntity userAwardRecord;
-    private TaskEntity task;
+    private EventTask<SendAwardMessageEvent.SendAwardMessage> eventTask;
 }

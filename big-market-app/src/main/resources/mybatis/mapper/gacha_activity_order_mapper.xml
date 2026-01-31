@@ -6,6 +6,7 @@
         <id column="id" property="id"/>
         <result column="user_id" property="userId"/>
         <result column="sku" property="sku"/>
+        <result column="sku_price" property="skuPrice"/>
         <result column="activity_id" property="activityId"/>
         <result column="activity_name" property="activityName"/>
         <result column="strategy_id" property="strategyId"/>
@@ -15,17 +16,25 @@
         <result column="month_count" property="monthCount"/>
         <result column="day_count" property="dayCount"/>
         <result column="state" property="state"/>
-        <result column="biz_id" property="bizId"/>
+        <result column="out_business_no" property="outBusinessNo"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <insert id="insert" parameterType="re.yuugu.hzx.infrastructure.persistent.po.GachaActivityOrder">
         insert into gacha_activity_order
-        (user_id, sku, activity_id, activity_name, strategy_id, order_id, order_time, total_count, month_count,
-         day_count, state, biz_id, create_time, update_time)
-        values (#{userId}, #{sku}, #{activityId}, #{activityName}, #{strategyId}, #{orderId}, #{orderTime},#{totalCount},
-                #{monthCount}, #{dayCount}, #{state}, #{bizId},
+        (user_id, sku, sku_price, activity_id, activity_name, strategy_id, order_id, order_time, total_count,
+         month_count, day_count, state, out_business_no, create_time, update_time)
+        values (#{userId}, #{sku}, #{skuPrice}, #{activityId}, #{activityName}, #{strategyId}, #{orderId}, #{orderTime},
+                #{totalCount}, #{monthCount}, #{dayCount}, #{state}, #{outBusinessNo},
                 now(), now())
     </insert>
+    <update id="updateOrderStateToCompleted">
+        update gacha_activity_order
+        set state='completed',
+            update_time=now()
+        where out_business_no = #{outBusinessNo}
+          and user_id = #{userId}
+          and state = 'wait_to_pay'
+    </update>
 </mapper>

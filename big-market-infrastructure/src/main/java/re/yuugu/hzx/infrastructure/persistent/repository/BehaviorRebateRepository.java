@@ -6,9 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.support.TransactionTemplate;
+import re.yuugu.hzx.domain.rebate.event.SendRebateMessageEvent;
 import re.yuugu.hzx.domain.rebate.model.aggregate.CreateRebateOrderAggregate;
 import re.yuugu.hzx.domain.rebate.model.entity.RebateOrderEntity;
-import re.yuugu.hzx.domain.rebate.model.entity.TaskEntity;
 import re.yuugu.hzx.domain.rebate.model.vo.BehaviorRebateVO;
 import re.yuugu.hzx.domain.rebate.model.vo.BehaviorTypeVO;
 import re.yuugu.hzx.domain.rebate.model.vo.RebateTypeVO;
@@ -23,6 +23,7 @@ import re.yuugu.hzx.infrastructure.persistent.po.UserBehaviorRebateOrder;
 import re.yuugu.hzx.infrastructure.persistent.redis.IRedisService;
 import re.yuugu.hzx.types.common.Constants;
 import re.yuugu.hzx.types.enums.ResponseCode;
+import re.yuugu.hzx.types.event.EventTask;
 import re.yuugu.hzx.types.exception.AppException;
 
 import javax.annotation.Resource;
@@ -82,7 +83,7 @@ public class BehaviorRebateRepository implements IBehaviorRebateRepository {
     public void doSaveRebateOrderAggregate(CreateRebateOrderAggregate createRebateOrderAggregate) {
         String userId = createRebateOrderAggregate.getUserId();
         RebateOrderEntity rebateOrderEntity = createRebateOrderAggregate.getRebateOrderEntity();
-        TaskEntity taskEntity = createRebateOrderAggregate.getTaskEntity();
+        EventTask<SendRebateMessageEvent.SendRebateMessage> eventTask = createRebateOrderAggregate.getEventTask();
 
         UserBehaviorRebateOrder userBehaviorRebateOrder = UserBehaviorRebateOrder.builder()
                 .userId(rebateOrderEntity.getUserId())
@@ -95,11 +96,11 @@ public class BehaviorRebateRepository implements IBehaviorRebateRepository {
                 .outBusinessNo(rebateOrderEntity.getOutBusinessNo())
                 .build();
         Task task = Task.builder()
-                .userId(taskEntity.getUserId())
-                .topic(taskEntity.getTopic())
-                .message(JSON.toJSONString(taskEntity.getMessage()))
-                .messageId(taskEntity.getMessageId())
-                .state(taskEntity.getState().getCode())
+                .userId(eventTask.getUserId())
+                .topic(eventTask.getTopic())
+                .message(JSON.toJSONString(eventTask.getMessage()))
+                .messageId(eventTask.getMessageId())
+                .state(eventTask.getState().getCode())
                 .build();
         try {
             dbRouter.doRouter(userId);
@@ -119,7 +120,7 @@ public class BehaviorRebateRepository implements IBehaviorRebateRepository {
         }
         //发送MQ消息
         try {
-            eventPublisher.publish(task.getTopic(), taskEntity.getMessage());
+            eventPublisher.publish(eventTask.getTopic(), eventTask.getMessage());
             taskDao.updateStateToCompleted(task);
         } catch (Exception e) {
             log.error("写入行为返利订单，发送mq消息失败");

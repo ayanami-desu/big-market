@@ -80,7 +80,7 @@ public class CreditRepository implements ICreditRepository {
         try {
             lock.lock(3, TimeUnit.SECONDS);
             dbRouter.doRouter(userId);
-            transactionTemplate.execute(status -> {
+            transactionTemplate.executeWithoutResult(status -> {
                 try {
                     userCreditOrderDao.insert(userCreditOrder);
                     if (TradeTypeVO.FORWARD.getCode().equals(userCreditOrderEntity.getTradeType().getCode())) {
@@ -105,30 +105,28 @@ public class CreditRepository implements ICreditRepository {
                         }
                     }
                     taskDao.insert(task);
-                    return 1;
                 } catch (DuplicateKeyException e) {
-                    status.setRollbackOnly();
                     log.error("写入积分订单，唯一索引冲突", e);
                     throw new AppException(ResponseCode.DUPLICATE_KEY_EXCEPTION.getCode(), ResponseCode.DUPLICATE_KEY_EXCEPTION.getInfo());
                 } catch (Exception e) {
-                    status.setRollbackOnly();
                     log.error("写入积分订单，错误", e);
                     throw e;
                 }
             });
+            //发送MQ消息
+            try {
+                log.info("发送积分支付成功消息");
+                eventPublisher.publish(eventTask.getTopic(), eventTask.getMessage());
+                taskDao.updateStateToCompleted(task);
+            } catch (Exception e) {
+                log.error("写入积分订单，发送mq消息失败");
+                taskDao.updateStateToFail(task);
+            }
         } finally {
             dbRouter.clear();
             lock.unlock();
         }
-        //发送MQ消息
-        try {
-            log.info("发送积分支付成功消息");
-            eventPublisher.publish(eventTask.getTopic(), eventTask.getMessage());
-            taskDao.updateStateToCompleted(task);
-        } catch (Exception e) {
-            log.error("写入积分订单，发送mq消息失败");
-            taskDao.updateStateToFail(task);
-        }
+
     }
 
     @Override
@@ -136,7 +134,6 @@ public class CreditRepository implements ICreditRepository {
         String userId = createCreditAdjustAggregate.getUserId();
         CreditAdjustEntity creditAdjustEntity = createCreditAdjustAggregate.getCreditAdjustEntity();
         UserCreditOrderEntity userCreditOrderEntity = createCreditAdjustAggregate.getUserCreditOrderEntity();
-
 
         UserCreditOrder userCreditOrder = new UserCreditOrder();
         userCreditOrder.setUserId(userCreditOrderEntity.getUserId());
@@ -150,7 +147,7 @@ public class CreditRepository implements ICreditRepository {
         try {
             lock.lock(3, TimeUnit.SECONDS);
             dbRouter.doRouter(userId);
-            transactionTemplate.execute(status -> {
+            transactionTemplate.executeWithoutResult(status -> {
                 try {
                     userCreditOrderDao.insert(userCreditOrder);
                     if (TradeTypeVO.FORWARD.getCode().equals(userCreditOrderEntity.getTradeType().getCode())) {
@@ -174,13 +171,10 @@ public class CreditRepository implements ICreditRepository {
                             log.error("积分账户存在，但是积分不足");
                         }
                     }
-                    return 1;
                 } catch (DuplicateKeyException e) {
-                    status.setRollbackOnly();
                     log.error("写入积分订单，唯一索引冲突", e);
                     throw new AppException(ResponseCode.DUPLICATE_KEY_EXCEPTION.getCode(), ResponseCode.DUPLICATE_KEY_EXCEPTION.getInfo());
                 } catch (Exception e) {
-                    status.setRollbackOnly();
                     log.error("写入积分订单，错误", e);
                     throw e;
                 }

@@ -104,27 +104,25 @@ public class BehaviorRebateRepository implements IBehaviorRebateRepository {
                 .build();
         try {
             dbRouter.doRouter(userId);
-            transactionTemplate.execute(status -> {
+            transactionTemplate.executeWithoutResult(status -> {
                 try {
                     userBehaviorRebateOrderDao.insert(userBehaviorRebateOrder);
                     taskDao.insert(task);
-                    return 1;
                 } catch (DuplicateKeyException e) {
-                    status.setRollbackOnly();
                     log.error("写入行为返利订单，唯一索引冲突", e);
                     throw new AppException(ResponseCode.DUPLICATE_KEY_EXCEPTION.getCode(), ResponseCode.DUPLICATE_KEY_EXCEPTION.getInfo());
                 }
             });
+            //发送MQ消息
+            try {
+                eventPublisher.publish(eventTask.getTopic(), eventTask.getMessage());
+                taskDao.updateStateToCompleted(task);
+            } catch (Exception e) {
+                log.error("写入行为返利订单，发送mq消息失败");
+                taskDao.updateStateToFail(task);
+            }
         } finally {
             dbRouter.clear();
-        }
-        //发送MQ消息
-        try {
-            eventPublisher.publish(eventTask.getTopic(), eventTask.getMessage());
-            taskDao.updateStateToCompleted(task);
-        } catch (Exception e) {
-            log.error("写入行为返利订单，发送mq消息失败");
-            taskDao.updateStateToFail(task);
         }
     }
 

@@ -58,7 +58,7 @@ public class AwardRepository implements IAwardRepository {
     @Override
     public void doSaveUserAwardRecordAggregate(CreateUserAwardRecordAggregate createUserAwardRecordAggregate) {
         UserAwardRecordEntity userAwardRecordEntity = createUserAwardRecordAggregate.getUserAwardRecord();
-        EventTask<SendAwardMessageEvent.SendAwardMessage> eventTask  = createUserAwardRecordAggregate.getEventTask();
+        EventTask<SendAwardMessageEvent.SendAwardMessage> eventTask = createUserAwardRecordAggregate.getEventTask();
         UserAwardRecord userAwardRecord = UserAwardRecord.builder()
                 .userId(userAwardRecordEntity.getUserId())
                 .activityId(userAwardRecordEntity.getActivityId())
@@ -81,39 +81,35 @@ public class AwardRepository implements IAwardRepository {
         userGachaOrderReq.setOrderId(userAwardRecordEntity.getOrderId());
         try {
             dbRouter.doRouter(userAwardRecordEntity.getUserId());
-            transactionTemplate.execute(status -> {
+            transactionTemplate.executeWithoutResult(status -> {
                 try {
                     userAwardRecordDao.insert(userAwardRecord);
                     taskDao.insert(task);
                     //更新订单状态
                     int count = userGachaOrderDao.updateOrderStateToUsed(userGachaOrderReq);
                     if (count != 1) {
-                        status.setRollbackOnly();
                         throw new AppException(ResponseCode.ACTIVITY_USED_GACHA_ORDER_ERR.getCode(), ResponseCode.ACTIVITY_USED_GACHA_ORDER_ERR.getInfo());
                     }
-                    return 1;
                 } catch (DuplicateKeyException e) {
-                    status.setRollbackOnly();
                     log.error("写入中奖记录，唯一索引冲突", e);
                     throw new AppException(ResponseCode.DUPLICATE_KEY_EXCEPTION.getCode(), ResponseCode.DUPLICATE_KEY_EXCEPTION.getInfo());
-                }catch (Exception e){
-                    status.setRollbackOnly();
+                } catch (Exception e) {
                     log.error("写入中奖记录，错误", e);
                     throw e;
                 }
             });
-
+            // 发送 mq 消息
+            try {
+                eventPublisher.publish(eventTask.getTopic(), eventTask.getMessage());
+                taskDao.updateStateToCompleted(task);
+            } catch (Exception e) {
+                log.error("写入中奖记录，发送mq消息失败");
+                taskDao.updateStateToFail(task);
+            }
         } finally {
             dbRouter.clear();
         }
-        // 发送 mq 消息
-        try {
-            eventPublisher.publish(eventTask.getTopic(), eventTask.getMessage());
-            taskDao.updateStateToCompleted(task);
-        } catch (Exception e) {
-            log.error("写入中奖记录，发送mq消息失败");
-            taskDao.updateStateToFail(task);
-        }
+
     }
 
     @Override
@@ -128,7 +124,7 @@ public class AwardRepository implements IAwardRepository {
                     .orderId(userAwardRecordEntity.getOrderId())
                     .build();
             dbRouter.doRouter(userId);
-            transactionTemplate.execute(status -> {
+            transactionTemplate.executeWithoutResult(status -> {
                 try {
                     log.info("开始为用户发放积分奖励");
                     //1. 更新发奖订单的状态
@@ -143,14 +139,10 @@ public class AwardRepository implements IAwardRepository {
                     if (cnt != 1) {
                         userCreditAccountDao.insert(userId, creditAwardEntity.getCreditAmount());
                     }
-                    return 1;
                 } catch (DuplicateKeyException e) {
-                    status.setRollbackOnly();
                     log.error("发放积分奖励时, 唯一索引冲突", e);
                     throw new AppException(ResponseCode.DUPLICATE_KEY_EXCEPTION.getCode(), ResponseCode.DUPLICATE_KEY_EXCEPTION.getInfo());
-                }
-                catch (Exception e){
-                    status.setRollbackOnly();
+                } catch (Exception e) {
                     log.error("发放积分奖励时出错", e);
                     throw e;
                 }

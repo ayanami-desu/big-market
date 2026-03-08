@@ -195,14 +195,14 @@ public class ActivityRepository implements IActivityRepository {
 
     @Override
     public void doSaveCreateGachaOrderAggregate(CreateGachaOrderAggregate createGachaOrderAggregate) {
+        ActivityAccountDayEntity activityAccountDayEntity = createGachaOrderAggregate.getActivityAccountDayEntity();
+        ActivityAccountMonthEntity activityAccountMonthEntity = createGachaOrderAggregate.getActivityAccountMonthEntity();
+        UserGachaOrderEntity userGachaOrderEntity = createGachaOrderAggregate.getUserGachaOrderEntity();
+
         //需要执行事务
         try {
-            ActivityAccountDayEntity activityAccountDayEntity = createGachaOrderAggregate.getActivityAccountDayEntity();
-            ActivityAccountMonthEntity activityAccountMonthEntity = createGachaOrderAggregate.getActivityAccountMonthEntity();
-            UserGachaOrderEntity userGachaOrderEntity = createGachaOrderAggregate.getUserGachaOrderEntity();
-
             dbRouter.doRouter(createGachaOrderAggregate.getUserId());
-            transactionTemplate.execute(status -> {
+            transactionTemplate.executeWithoutResult(status -> {
                 try {
                     int totalCount = activityAccountDao.updateAccountQuotaSubtraction(GachaActivityAccount.builder().
                             userId(createGachaOrderAggregate.getUserId())
@@ -210,7 +210,6 @@ public class ActivityRepository implements IActivityRepository {
                             .build());
                     if (totalCount != 1) {
                         log.error("更新总账户出错：账户不存在");
-                        status.setRollbackOnly();
                         throw new AppException(ResponseCode.ACTIVITY_PARTAKE_STOCK_ERR.getCode(), ResponseCode.ACTIVITY_PARTAKE_STOCK_ERR.getInfo());
                     }
                     //处理日账户
@@ -222,7 +221,6 @@ public class ActivityRepository implements IActivityRepository {
                                 .build());
                         if (count != 1) {
                             log.error("更新日账户库存出错");
-                            status.setRollbackOnly();
                             throw new AppException(ResponseCode.ACTIVITY_PARTAKE_STOCK_DAY_ERR.getCode(), ResponseCode.ACTIVITY_PARTAKE_STOCK_DAY_ERR.getInfo());
                         }
                     } else {
@@ -244,7 +242,6 @@ public class ActivityRepository implements IActivityRepository {
                                 .build());
                         if (count != 1) {
                             log.error("更新月账户库存出错");
-                            status.setRollbackOnly();
                             throw new AppException(ResponseCode.ACTIVITY_PARTAKE_STOCK_MONTH_ERR.getCode(), ResponseCode.ACTIVITY_PARTAKE_STOCK_MONTH_ERR.getInfo());
                         }
                     } else {
@@ -266,9 +263,7 @@ public class ActivityRepository implements IActivityRepository {
                             .orderTime(userGachaOrderEntity.getOrderTime())
                             .orderState(userGachaOrderEntity.getOrderState().getCode())
                             .build());
-                    return 1;
                 } catch (DuplicateKeyException e) {
-                    status.setRollbackOnly();
                     log.error("写入抽奖订单时出现唯一索引冲突");
                     throw new AppException(ResponseCode.DUPLICATE_KEY_EXCEPTION.getCode(), ResponseCode.DUPLICATE_KEY_EXCEPTION.getInfo());
 
@@ -432,7 +427,7 @@ public class ActivityRepository implements IActivityRepository {
             //只要这里设置了路由，后面的方法都会自动根据路由结果进行分库
             //至于分表则需要在 dao 中设置注解
             dbRouter.doRouter(activityOrderEntity.getUserId());
-            transactionTemplate.execute(status -> {
+            transactionTemplate.executeWithoutResult(status -> {
                 try {
                     activityOrderDao.insert(gachaActivityOrder);
                     int count = activityAccountDao.updateAccountQuota(gachaActivityAccount);
@@ -443,13 +438,10 @@ public class ActivityRepository implements IActivityRepository {
                     //“如果有，就需要更新”
                     activityAccountDayDao.addAccountQuota(gachaActivityAccountDay);
                     activityAccountMonthDao.addAccountQuota(gachaActivityAccountMonth);
-                    return 1;
                 } catch (DuplicateKeyException e) {
-                    status.setRollbackOnly();
                     log.error("写入订单记录，唯一索引冲突");
                     throw new AppException(ResponseCode.DUPLICATE_KEY_EXCEPTION.getCode(), ResponseCode.DUPLICATE_KEY_EXCEPTION.getInfo());
                 } catch (Exception e) {
-                    status.setRollbackOnly();
                     log.error("写入订单记录，出现错误");
                     throw e;
                 }
@@ -494,16 +486,13 @@ public class ActivityRepository implements IActivityRepository {
             //只要这里设置了路由，后面的方法都会自动根据路由结果进行分库
             //至于分表则需要在 dao 中设置注解
             dbRouter.doRouter(activityOrderEntity.getUserId());
-            transactionTemplate.execute(status -> {
+            transactionTemplate.executeWithoutResult(status -> {
                 try {
                     activityOrderDao.insert(gachaActivityOrder);
-                    return 1;
                 } catch (DuplicateKeyException e) {
-                    status.setRollbackOnly();
                     log.error("写入订单记录，唯一索引冲突");
                     throw new AppException(ResponseCode.DUPLICATE_KEY_EXCEPTION.getCode(), ResponseCode.DUPLICATE_KEY_EXCEPTION.getInfo());
                 } catch (Exception e) {
-                    status.setRollbackOnly();
                     log.error("写入订单记录，出现错误");
                     throw e;
                 }

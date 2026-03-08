@@ -2,6 +2,8 @@ package re.yuugu.hzx.trigger.http;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.*;
 import re.yuugu.hzx.api.IGachaActivityService;
 import re.yuugu.hzx.api.dto.request.ActivityDailySignReq;
@@ -40,6 +42,7 @@ import java.util.List;
 @Slf4j
 @CrossOrigin("${app.config.cross-origin}")
 @RequestMapping("/api/${app.config.api-version}/gacha/activity")
+@RefreshScope
 public class ActivityGachaController implements IGachaActivityService {
     @Resource
     private IGachaActivityArmory activityArmory;
@@ -53,6 +56,9 @@ public class ActivityGachaController implements IGachaActivityService {
     private IUserAwardRecordService userAwardRecordService;
     @Resource
     private IBehaviorRebateService behaviorRebateService;
+
+    @Value("${degrade-switch.value}")
+    private Boolean degradeSwitch;
 
     private final SimpleDateFormat dateFormatDay = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -88,6 +94,12 @@ public class ActivityGachaController implements IGachaActivityService {
     @Override
     @RequestMapping(value = "activity_draw", method = RequestMethod.POST)
     public Response<ActivityDrawRes> activityDrawAward(@RequestBody ActivityDrawReq activityDrawReq) {
+        if(degradeSwitch) {
+            return Response.<ActivityDrawRes>builder()
+                    .code(ResponseCode.SERVICE_DEGRADE.getCode())
+                    .info(ResponseCode.SERVICE_DEGRADE.getInfo())
+                    .build();
+        }
         try {
             //1. 参数校验
             String userId = activityDrawReq.getUserId();

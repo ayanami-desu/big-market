@@ -16,11 +16,21 @@ app:
 
 # Spring 配置；rabbitmq
 spring:
+  config:
+    import:
+      - optional:nacos:big-market-app.yaml
+  cloud:
+    nacos:
+      config:
+        server-addr: 127.0.0.1:18848
+        import-check:
+          enabled: false
+        file-extension: yaml
   rabbitmq:
-    addresses: localhost
-    port: 5672
+    host: 127.0.0.1
+    port: 15673
     username: admin
-    password: DsvZgZ8_Q4ezz3j
+    password: admin123456
     listener:
       simple:
         prefetch: 1 # 每次投递n个消息，消费完在投递n个
@@ -55,7 +65,7 @@ mini-db-router:
       list: db01,db02
       db00:
         driver-class-name: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://127.0.0.1:3306/big_market?useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC&useSSL=false
+        url: jdbc:mysql://127.0.0.1:13306/big_market?useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC&useSSL=false
         username: root
         password: 123456
         type-class-name: com.zaxxer.hikari.HikariDataSource
@@ -70,7 +80,7 @@ mini-db-router:
           connection-test-query: SELECT 1
       db01:
         driver-class-name: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://127.0.0.1:3306/big_market_01?useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC&useSSL=false
+        url: jdbc:mysql://127.0.0.1:13306/big_market_01?useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC&useSSL=false
         username: root
         password: 123456
         type-class-name: com.zaxxer.hikari.HikariDataSource
@@ -85,7 +95,7 @@ mini-db-router:
           connection-test-query: SELECT 1
       db02:
         driver-class-name: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://127.0.0.1:3306/big_market_02?useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC&useSSL=false
+        url: jdbc:mysql://127.0.0.1:13306/big_market_02?useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC&useSSL=false
         username: root
         password: 123456
         type-class-name: com.zaxxer.hikari.HikariDataSource
@@ -108,8 +118,8 @@ mybatis:
 redis:
   sdk:
     config:
-      host: localhost
-      port: 6379
+      host: 127.0.0.1
+      port: 16379
       pool-size: 10
       min-idle-size: 5
       idle-timeout: 30000
